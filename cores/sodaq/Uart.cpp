@@ -31,7 +31,7 @@ Uart::Uart(SERCOM *_s, uint8_t _pinRX, uint8_t _pinTX, SercomRXPad _padRX, Serco
 
 void Uart::begin(unsigned long baudrate)
 {
-  begin(baudrate, (uint8_t)SERIAL_8N1);
+  begin(baudrate, SERIAL_8N1);
 }
 
 void Uart::begin(unsigned long baudrate, uint16_t config)
@@ -39,7 +39,11 @@ void Uart::begin(unsigned long baudrate, uint16_t config)
   pinPeripheral(uc_pinRX, g_APinDescription[uc_pinRX].ulPinType);
   pinPeripheral(uc_pinTX, g_APinDescription[uc_pinTX].ulPinType);
 
-  sercom->initUART(UART_INT_CLOCK, SAMPLE_RATE_x16, baudrate);
+  if (baudrate < 600) {
+    sercom->initUART(UART_INT_CLOCK, SAMPLE_RATE_ARITH_x16, baudrate);
+  } else {
+    sercom->initUART(UART_INT_CLOCK, SAMPLE_RATE_FRACT_x16, baudrate);
+  }
   sercom->initFrame(extractCharSize(config), LSB_FIRST, extractParity(config), extractNbStopBit(config));
   sercom->initPads(uc_padTX, uc_padRX);
 
@@ -75,6 +79,11 @@ void Uart::IrqHandler()
 int Uart::available()
 {
   return rxBuffer.available();
+}
+
+int Uart::availableForWrite()
+{
+  return (sercom->isDataRegisterEmptyUART() ? 1 : 0);
 }
 
 int Uart::peek()

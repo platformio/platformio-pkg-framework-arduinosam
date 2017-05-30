@@ -86,8 +86,11 @@ typedef enum
 
 typedef enum
 {
-	SAMPLE_RATE_x16 = 0x1,	//Fractional
-	SAMPLE_RATE_x8 = 0x3,	//Fractional
+	SAMPLE_RATE_ARITH_x16 = 0x0,	// Arithmetic
+	SAMPLE_RATE_FRACT_x16 = 0x1,	// Fractional
+	SAMPLE_RATE_ARITH_x8 = 0x2,	// Arithmetic
+	SAMPLE_RATE_FRACT_x8 = 0x3,	// Fractional
+	SAMPLE_RATE_ARITH_x3 = 0x4,	// Arithmetic
 } SercomUartSampleRate;
 
 typedef enum
@@ -175,8 +178,7 @@ class SERCOM
 		SercomDataOrder getDataOrderSPI( void ) ;
 		void setBaudrateSPI(uint8_t divider) ;
 		void setClockModeSPI(SercomSpiClockMode clockMode) ;
-		void writeDataSPI(uint8_t data) ;
-		uint16_t readDataSPI( void ) ;
+		uint8_t transferDataSPI(uint8_t data) ;
 		bool isBufferOverflowErrorSPI( void ) ;
 		bool isDataRegisterEmptySPI( void ) ;
 		bool isTransmitCompleteSPI( void ) ;

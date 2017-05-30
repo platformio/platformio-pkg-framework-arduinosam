@@ -63,8 +63,12 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
+	PROVIDE(__sodaq_firmware_state = ORIGIN(FLASH) - 0x100);
+
 	.text :
 	{
+		__text_start__ = .;
+
 		KEEP(*(.isr_vector))
 		*(.text*)
 
@@ -87,6 +91,7 @@ SECTIONS
 
 		*(.rodata*)
 
+		KEEP(*(.sodaq_keep))
 		KEEP(*(.eh_frame*))
 	} > FLASH
 
@@ -166,7 +171,7 @@ SECTIONS
 		PROVIDE_HIDDEN (__fini_array_end = .);
 
 		KEEP(*(.jcr*))
-		. = ALIGN(4);
+		. = ALIGN(16);
 		/* All data end */
 		__data_end__ = .;
 
