@@ -34,7 +34,7 @@ void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint
   resetUART();
 
   //Setting the CTRLA register
-  sercom->USART.CTRLA.reg =	SERCOM_USART_CTRLA_MODE(mode) |
+  sercom->USART.CTRLA.reg = SERCOM_USART_CTRLA_MODE(mode) |
                 SERCOM_USART_CTRLA_SAMPR(sampleRate);
 
   //Setting the Interrupt register
@@ -45,19 +45,39 @@ void SERCOM::initUART(SercomUartMode mode, SercomUartSampleRate sampleRate, uint
   {
     uint16_t sampleRateValue;
 
-    if (sampleRate == SAMPLE_RATE_x16) {
+    if (sampleRate == SAMPLE_RATE_FRACT_x16 || sampleRate == SAMPLE_RATE_ARITH_x16) {
       sampleRateValue = 16;
-    } else {
+    } else if (sampleRate == SAMPLE_RATE_FRACT_x8 || sampleRate == SAMPLE_RATE_ARITH_x8) {
       sampleRateValue = 8;
+    } else {
+      sampleRateValue = 3;
     }
 
-    // Asynchronous fractional mode (Table 24-2 in datasheet)
-    //   BAUD = fref / (sampleRateValue * fbaud)
-    // (multiply by 8, to calculate fractional piece)
-    uint32_t baudTimes8 = (SystemCoreClock * 8) / (sampleRateValue * baudrate);
+    if (sampleRate == SAMPLE_RATE_FRACT_x16 || sampleRate == SAMPLE_RATE_FRACT_x8) {
+      // Asynchronous fractional mode (Table 24-2 in datasheet)
+      //   BAUD = fref / (sampleRateValue * fbaud)
+      // (multiply by 8, to calculate fractional piece)
+      uint32_t baudTimes8 = (SystemCoreClock * 8) / (sampleRateValue * baudrate);
 
-    sercom->USART.BAUD.FRAC.FP   = (baudTimes8 % 8);
-    sercom->USART.BAUD.FRAC.BAUD = (baudTimes8 / 8);
+      sercom->USART.BAUD.FRAC.FP   = (baudTimes8 % 8);
+      sercom->USART.BAUD.FRAC.BAUD = (baudTimes8 / 8);
+    }
+    else {
+      // Asynchronous arithmetic mode
+#if 0
+      // 65536 * ( 1 - sampleRateValue * baudrate / SystemCoreClock);
+      sercom->USART.BAUD.reg = 65536.0f * ( 1.0f - (float)(sampleRateValue) * (float)(baudrate) / (float)(SystemCoreClock));
+#else
+      // Alternative computation.
+      // WARNING. For baudrates above 1200 we need 64 bits arithmetic!!
+      // 65536 - ((sampleRateValue * baudrate * 65536) - (SystemCoreClock / 2)) / SystemCoreClock
+      uint64_t term1 = ((uint64_t)sampleRateValue * baudrate) * 65536;
+      term1 -= (SystemCoreClock / 2);   // Some rounding
+      term1 /= SystemCoreClock;
+      uint16_t baud = (uint16_t)-term1;
+      sercom->USART.BAUD.reg = baud;
+#endif
+    }
   }
 }
 void SERCOM::initFrame(SercomUartCharSize charSize, SercomDataOrder dataOrder, SercomParityMode parityMode, SercomNumberStopBit nbStopBits)
@@ -104,6 +124,10 @@ void SERCOM::enableUART()
 
 void SERCOM::flushUART()
 {
+  // Skip checking transmission completion if data register is empty
+  if(isDataRegisterEmptyUART())
+    return;
+
   // Wait for transmission to complete
   while(!sercom->USART.INTFLAG.bit.TXC);
 }
@@ -236,13 +260,13 @@ void SERCOM::enableSPI()
 
 void SERCOM::disableSPI()
 {
-  //Setting the enable bit to 0
-  sercom->SPI.CTRLA.bit.ENABLE = 0;
-
   while(sercom->SPI.SYNCBUSY.bit.ENABLE)
   {
     //Waiting then enable bit from SYNCBUSY is equal to 0;
   }
+
+  //Setting the enable bit to 0
+  sercom->SPI.CTRLA.bit.ENABLE = 0;
 }
 
 void SERCOM::setDataOrderSPI(SercomDataOrder dataOrder)
@@ -296,24 +320,11 @@ void SERCOM::setClockModeSPI(SercomSpiClockMode clockMode)
   enableSPI();
 }
 
-void SERCOM::writeDataSPI(uint8_t data)
+uint8_t SERCOM::transferDataSPI(uint8_t data)
 {
-  while( sercom->SPI.INTFLAG.bit.DRE == 0 )
-  {
-    // Waiting Data Registry Empty
-  }
-
   sercom->SPI.DATA.bit.DATA = data; // Writing data into Data register
 
-  while( sercom->SPI.INTFLAG.bit.TXC == 0 || sercom->SPI.INTFLAG.bit.DRE == 0 )
-  {
-    // Waiting Complete Transmission
-  }
-}
-
-uint16_t SERCOM::readDataSPI()
-{
-  while( sercom->SPI.INTFLAG.bit.DRE == 0 || sercom->SPI.INTFLAG.bit.RXC == 0 )
+  while( sercom->SPI.INTFLAG.bit.RXC == 0 )
   {
     // Waiting Complete Reception
   }
@@ -553,11 +564,8 @@ bool SERCOM::sendDataSlaveWIRE(uint8_t data)
   //Send data
   sercom->I2CS.DATA.bit.DATA = data;
 
-  //Wait data transmission successful
-  while(!sercom->I2CS.INTFLAG.bit.DRDY);
-
   //Problems on line? nack received?
-  if(sercom->I2CS.STATUS.bit.RXNACK)
+  if(!sercom->I2CS.INTFLAG.bit.DRDY || sercom->I2CS.STATUS.bit.RXNACK)
     return false;
   else
     return true;

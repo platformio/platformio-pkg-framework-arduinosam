@@ -30,8 +30,8 @@ const PinDescription g_APinDescription[]=
   { PORTB, 9,  PIO_TIMER,      (PIN_ATTR_DIGITAL | PIN_ATTR_PWM | PIN_ATTR_TIMER),     No_ADC_Channel, PWM4_CH1,   TC4_CH1,      EXTERNAL_INT_9    }, // TC4/WO[1]
 
   // 4..5 Other Digital Pins
-  { PORTA, 21, PIO_INPUT,      (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4    }, // ACCEL_INT1
-  { PORTA, 20, PIO_INPUT,      (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5    }, // ACCEL_INT2
+  { PORTA, 21, PIO_INPUT,      (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_5    }, // ACCEL_INT1
+  { PORTA, 20, PIO_INPUT,      (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_4    }, // ACCEL_INT2
 
   // 6..13 Main IO Pins (D6-D13) Digital Properties
   { PORTA, 6,  PIO_TIMER,      (PIN_ATTR_DIGITAL | PIN_ATTR_PWM | PIN_ATTR_TIMER),     No_ADC_Channel, PWM1_CH0,   TCC1_CH0,     EXTERNAL_INT_6    }, // TCC1/WO[0]
@@ -97,6 +97,12 @@ const PinDescription g_APinDescription[]=
   // 47..48 I2C
   { PORTA, 22, PIO_SERCOM,     (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_6    }, // I2C_SDA
   { PORTA, 23, PIO_SERCOM,     (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_7    }, // I2C_SCL
+  
+  // 49 LoRa RESET
+  { PORTA,  4, PIO_OUTPUT,     (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_NONE }, // LORA_RESET
+
+  // 50
+  { PORTA, 19, PIO_OUTPUT,     (PIN_ATTR_DIGITAL),                                     No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_3    },
 } ;
 
 const void* g_apTCInstances[TCC_INST_NUM+TC_INST_NUM]={ TCC0, TCC1, TCC2, TC3, TC4, TC5 } ;

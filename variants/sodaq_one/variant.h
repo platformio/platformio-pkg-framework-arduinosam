@@ -32,6 +32,11 @@
 /** Master clock frequency */
 #define VARIANT_MCK           (48000000ul)
 
+/** Copied from bootloader. It will cause a "stay in bootloader" when doing 1200bps-touch */
+#define BOOT_DOUBLE_TAP_ADDRESS         (0x20007FFCul)
+#define BOOT_DOUBLE_TAP_DATA            (*((volatile uint32_t *) BOOT_DOUBLE_TAP_ADDRESS))
+#define DOUBLE_TAP_MAGIC                0x07738135
+
 /*----------------------------------------------------------------------------
  *        Headers
  *----------------------------------------------------------------------------*/
@@ -53,7 +58,7 @@ extern "C"
  *----------------------------------------------------------------------------*/
 
 // Number of pins defined in PinDescription array
-#define PINS_COUNT           (49u)
+#define PINS_COUNT           (50u)
 #define NUM_DIGITAL_PINS     (12u)	// Without the "other" Digital Pins
 #define NUM_ANALOG_INPUTS    (12u)	// Without the "other" Analog Pins
 #define NUM_ANALOG_OUTPUTS   (1u)
@@ -82,6 +87,9 @@ extern "C"
 #define PIN_LED_RED          (14u)
 #define PIN_LED_GREEN        (15u)
 #define PIN_LED_BLUE         (16u)
+
+//LORA
+#define LORA_RESET           (49u)
 
 /*
  * Analog pins

@@ -20,6 +20,8 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#define CORE_VERSION "SodaqCore v1.6.14"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -35,6 +37,7 @@ typedef uint16_t word;
 //
 #include "avr/pgmspace.h"
 #include "avr/interrupt.h"
+#include "avr/io.h"
 
 #include "binary.h"
 #include "itoa.h"
@@ -53,6 +56,10 @@ extern "C"{
 #define microsecondsToClockCycles(a) ( (a) * (SystemCoreClock / 1000000L) )
 
 void yield( void ) ;
+
+/* system functions */
+int main( void );
+void init( void );
 
 /* sketch */
 void setup( void ) ;
@@ -113,6 +120,11 @@ void loop( void ) ;
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 
 #define bit(b) (1UL << (b))
+
+#if (ARDUINO_SAMD_VARIANT_COMPLIANCE >= 10606)
+// Interrupts
+#define digitalPinToInterrupt(P)   ( P )
+#endif
 
 // USB Device
 #include "USB/USBDesc.h"
