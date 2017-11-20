@@ -62,6 +62,7 @@ int pinPeripheral( uint32_t ulPin, EPioType ulPeripheral )
     break ;
 
     case PIO_ANALOG:
+    case PIO_ANALOG_ALT:
     case PIO_SERCOM:
     case PIO_SERCOM_ALT:
     case PIO_TIMER:

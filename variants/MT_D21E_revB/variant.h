@@ -92,9 +92,9 @@ extern "C"
 #define NUM_DIGITAL_PINS     PINS_COUNT
 #define NUM_ANALOG_INPUTS    (10u)
 
-#if (SAMD || SAMC)
+#if (SAMD_SERIES || SAMC_SERIES)
 #define NUM_ANALOG_OUTPUTS   (1u)
-#elif (SAML)
+#elif (SAML_SERIES)
 #define NUM_ANALOG_OUTPUTS   (2u)
 #else
 #error "variant.h: Unsupported chip"
@@ -147,6 +147,8 @@ extern "C"
 /*
  * Analog pins
  */
+#define PIN_A0               (0ul)
+#define PIN_A1               (1ul)
 #define PIN_A2               (2ul)
 #define PIN_A3               (3ul)
 #define PIN_A4               (4ul)
@@ -162,6 +164,8 @@ extern "C"
 #define PIN_DAC1             (5ul)
 #endif
 
+static const uint8_t A0   = PIN_A0;
+static const uint8_t A1   = PIN_A1;
 static const uint8_t A2   = PIN_A2;
 static const uint8_t A3   = PIN_A3;
 static const uint8_t A4   = PIN_A4;

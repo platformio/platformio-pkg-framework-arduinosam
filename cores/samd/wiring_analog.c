@@ -30,21 +30,35 @@ static int _writeResolution = 8;
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncADC() __attribute__((always_inline, unused));
 static void syncADC() {
+#if SAMD
   while (ADC->STATUS.bit.SYNCBUSY == 1)
     ;
+#elif SAMC21
+  while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+  while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+#endif
+
 }
 
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncDAC() __attribute__((always_inline, unused));
 static void syncDAC() {
+#if SAMD
   while (DAC->STATUS.bit.SYNCBUSY == 1)
     ;
+#elif SAMC21
+  while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
+#endif
 }
 
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncTC_16(Tc* TCx) __attribute__((always_inline, unused));
 static void syncTC_16(Tc* TCx) {
+#if SAMD
   while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
+#elif SAMC21
+  while (TCx->COUNT16.SYNCBUSY.reg & (TC_SYNCBUSY_SWRST | TC_SYNCBUSY_ENABLE | TC_SYNCBUSY_CTRLB | TC_SYNCBUSY_STATUS | TC_SYNCBUSY_COUNT));
+#endif
 }
 
 // Wait for synchronization of registers between the clock domains
@@ -57,13 +71,28 @@ void analogReadResolution(int res)
 {
   _readResolution = res;
   if (res > 10) {
+#if SAMD
     ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_12BIT_Val;
+#elif SAMC21 
+    ADC0->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_12BIT_Val;
+    ADC1->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_12BIT_Val;
+#endif
     _ADCResolution = 12;
   } else if (res > 8) {
+#if SAMD
     ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_10BIT_Val;
+#elif SAMC21 
+    ADC0->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_10BIT_Val;
+    ADC1->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_10BIT_Val;
+#endif
     _ADCResolution = 10;
   } else {
+#if SAMD
     ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_8BIT_Val;
+#elif SAMC21 
+    ADC0->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_8BIT_Val;
+    ADC1->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_8BIT_Val;
+#endif
     _ADCResolution = 8;
   }
   syncADC();
@@ -94,6 +123,7 @@ static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
 void analogReference(eAnalogReference mode)
 {
   syncADC();
+#if SAMD
   switch (mode)
   {
     case AR_INTERNAL:
@@ -123,6 +153,18 @@ void analogReference(eAnalogReference mode)
       ADC->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val; // 1/2 VDDANA = 0.5* 3V3 = 1.65V
       break;
   }
+#elif SAMC
+  if (mode == 0) {              // Set to 1.0V for the SAML, 1.024V for the SAMC
+    SUPC->VREF.reg &= ~SUPC_VREF_SEL_Msk;
+  } else if (mode > 5) {                // Values above 5 are used for the Supply Controller reference (AR_INTREF)
+    SUPC->VREF.reg &= ~SUPC_VREF_SEL_Msk;
+    SUPC->VREF.reg |= SUPC_VREF_SEL(mode - 6);  // 
+    mode = 0;
+  }
+  ADC0->REFCTRL.bit.REFSEL = mode;
+  ADC1->REFCTRL.bit.REFSEL = mode;
+
+#endif
 }
 
 uint32_t analogRead(uint32_t pin)
@@ -132,6 +174,15 @@ uint32_t analogRead(uint32_t pin)
   if (pin < A0) {
     pin += A0;
   }
+
+#if (SAMC21)
+  Adc* ADC;
+  if ( g_APinDescription[pin].ulPinType == PIO_ANALOG_ALT ) {
+    ADC = ADC1;
+  } else {
+    ADC = ADC0;
+  }
+#endif
 
   pinPeripheral(pin, PIO_ANALOG);
 
@@ -237,6 +288,16 @@ void analogWrite(uint32_t pin, uint32_t value)
       tcEnabled[tcNum] = true;
 
       uint16_t GCLK_CLKCTRL_IDs[] = {
+#if SAMC21
+        GCM_TCC0_TCC1,
+        GCM_TCC0_TCC1,
+        GCM_TCC2,
+        GCM_TC0_TC1,
+        GCM_TC0_TC1,
+        GCM_TC2_TC3,
+        GCM_TC2_TC3,
+        GCM_TC4,
+#else
         GCLK_CLKCTRL_ID(GCM_TCC0_TCC1), // TCC0
         GCLK_CLKCTRL_ID(GCM_TCC0_TCC1), // TCC1
         GCLK_CLKCTRL_ID(GCM_TCC2_TC3),  // TCC2
@@ -245,9 +306,15 @@ void analogWrite(uint32_t pin, uint32_t value)
         GCLK_CLKCTRL_ID(GCM_TC4_TC5),   // TC5
         GCLK_CLKCTRL_ID(GCM_TC6_TC7),   // TC6
         GCLK_CLKCTRL_ID(GCM_TC6_TC7),   // TC7
+#endif
       };
+#if SAMD
       GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_IDs[tcNum]);
       while (GCLK->STATUS.bit.SYNCBUSY == 1);
+#elif SAMC
+      GCLK->PCHCTRL[GCLK_CLKCTRL_IDs[tcNum]].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
+      while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
+#endif
 
       // Set PORT
       if (tcNum >= TCC_INST_NUM) {
@@ -257,8 +324,14 @@ void analogWrite(uint32_t pin, uint32_t value)
         TCx->COUNT16.CTRLA.bit.ENABLE = 0;
         syncTC_16(TCx);
         // Set Timer counter Mode to 16 bits, normal PWM
-        TCx->COUNT16.CTRLA.reg |= TC_CTRLA_MODE_COUNT16 | TC_CTRLA_WAVEGEN_NPWM;
+        TCx->COUNT16.CTRLA.reg |= TC_CTRLA_MODE_COUNT16;
         syncTC_16(TCx);
+#if SAMD
+        TCx->COUNT16.CTRLA.reg |= TC_CTRLA_WAVEGEN_NPWM;
+#elif SAMC21
+        TCx->COUNT16.WAVE.reg = TC_WAVE_WAVEGEN_NPWM;
+#endif
+
         // Set the initial value
         TCx->COUNT16.CC[tcChannel].reg = (uint32_t) value;
         syncTC_16(TCx);
@@ -287,9 +360,20 @@ void analogWrite(uint32_t pin, uint32_t value)
     } else {
       if (tcNum >= TCC_INST_NUM) {
         Tc* TCx = (Tc*) GetTC(pinDesc.ulPWMChannel);
+#if SAMC
+        TCx->COUNT16.CCBUF[tcChannel].reg = (uint32_t) value;
+#else
         TCx->COUNT16.CC[tcChannel].reg = (uint32_t) value;
+#endif
         syncTC_16(TCx);
       } else {
+#if SAMC
+// LUPD caused endless spinning in syncTCC() on SAML (and probably SAMC). Note that CCBUF writes are already
+// atomic. The LUPD bit is intended for updating several registers at once, which analogWrite() does not do.
+        // -- Configure TCC
+        Tcc* TCCx = (Tcc*) GetTC(pinDesc.ulPWMChannel);
+        TCCx->CCBUF[tcChannel].reg = (uint32_t) value;
+#else
         Tcc* TCCx = (Tcc*) GetTC(pinDesc.ulPWMChannel);
         TCCx->CTRLBSET.bit.LUPD = 1;
         syncTCC(TCCx);
@@ -297,6 +381,7 @@ void analogWrite(uint32_t pin, uint32_t value)
         syncTCC(TCCx);
         TCCx->CTRLBCLR.bit.LUPD = 1;
         syncTCC(TCCx);
+#endif
       }
     }
     return;

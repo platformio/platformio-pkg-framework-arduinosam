@@ -44,6 +44,8 @@
 #ifndef _SAMC21_
 #define _SAMC21_
 
+#undef USBCON
+
 /**
  * \defgroup SAMC21_definitions SAMC21 Device Definitions
  * \brief SAMC21 CMSIS Definitions.

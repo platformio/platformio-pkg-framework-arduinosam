@@ -16,6 +16,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "sam.h"
+
+#if (SAMD21_SERIES || SAML21_SERIES)
 
 #include <stdio.h>
 #include <stdint.h>
@@ -25,7 +28,6 @@
 #include "variant.h"
 #include "USB_host.h"
 #include "samd21_host.h"
-#include "sam.h"
 #include "wiring_digital.h"
 #include "wiring_private.h"
 
@@ -520,3 +522,6 @@ uint32_t UHD_Pipe_Is_Transfer_Complete(uint32_t ul_pipe, uint32_t ul_token_type)
 // }
 
 #endif //  HOST_DEFINED
+
+#endif // (SAMD21_SERIES || SAML21_SERIES)
+
