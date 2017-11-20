@@ -368,3 +368,31 @@ tian_cons.pid.0=0xEA70
 tian_cons.descriptor.0=Standard Com Port
 tian_cons.hide=true
 tian_cons.build.board=SAMD_TIAN
+
+
+# MattairTech MT-D21E (rev B)
+mattairtech_mt_d21e_revb.name=MattairTech MT-D21E (rev B)
+mattairtech_mt_d21e_revb.vid.0=0x16D0
+mattairtech_mt_d21e_revb.pid.0=0x0557
+mattairtech_mt_d21e_revb.vid.1=0x16D0
+mattairtech_mt_d21e_revb.pid.1=0x0856
+mattairtech_mt_d21e_revb.vid.2=0x16D0
+mattairtech_mt_d21e_revb.pid.2=0x0B41
+mattairtech_mt_d21e_revb.vid.3=0x16D0
+mattairtech_mt_d21e_revb.pid.3=0x0B40
+mattairtech_mt_d21e_revb.vid.4=0x16D0
+mattairtech_mt_d21e_revb.pid.4=0x0A0C
+mattairtech_mt_d21e_revb.vid.5=0x16D0
+mattairtech_mt_d21e_revb.pid.5=0x0856
+mattairtech_mt_d21e_revb.build.mcu=cortex-m0plus
+mattairtech_mt_d21e_revb.build.f_cpu=48000000L
+mattairtech_mt_d21e_revb.build.usb_product="MT-D21E Rev B"
+mattairtech_mt_d21e_revb.build.usb_manufacturer="MattairTech LLC"
+mattairtech_mt_d21e_revb.build.board=SAMD_ZERO
+mattairtech_mt_d21e_revb.build.core=arduino
+mattairtech_mt_d21e_revb.build.variant=MT_D21E_revB
+mattairtech_mt_d21e_revb.build.variant_system_lib=
+mattairtech_mt_d21e_revb.build.vid=0x16D0
+mattairtech_mt_d21e_revb.upload.protocol=sam-ba
+mattairtech_mt_d21e_revb.bootloader.tool=arduino:openocd
+
