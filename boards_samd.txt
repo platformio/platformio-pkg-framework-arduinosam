@@ -390,6 +390,7 @@ mattairtech_mt_d21e_revb.build.usb_product="MT-D21E Rev B"
 mattairtech_mt_d21e_revb.build.usb_manufacturer="MattairTech LLC"
 mattairtech_mt_d21e_revb.build.board=SAMD_ZERO
 mattairtech_mt_d21e_revb.build.core=arduino
+mattairtech_mt_d21e_revb.build.extra_flags=
 mattairtech_mt_d21e_revb.build.variant=MT_D21E_revB
 mattairtech_mt_d21e_revb.build.variant_system_lib=
 mattairtech_mt_d21e_revb.build.vid=0x16D0

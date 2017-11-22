@@ -30,12 +30,12 @@ static int _writeResolution = 8;
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncADC() __attribute__((always_inline, unused));
 static void syncADC() {
-#if SAMD
-  while (ADC->STATUS.bit.SYNCBUSY == 1)
-    ;
-#elif SAMC21
+#if SAMC
   while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
+#else
+  while (ADC->STATUS.bit.SYNCBUSY == 1)
+    ;
 #endif
 
 }
@@ -43,21 +43,21 @@ static void syncADC() {
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncDAC() __attribute__((always_inline, unused));
 static void syncDAC() {
-#if SAMD
+#if SAMC
+  while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
+#else
   while (DAC->STATUS.bit.SYNCBUSY == 1)
     ;
-#elif SAMC21
-  while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
 #endif
 }
 
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncTC_16(Tc* TCx) __attribute__((always_inline, unused));
 static void syncTC_16(Tc* TCx) {
-#if SAMD
-  while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
-#elif SAMC21
+#if SAMC
   while (TCx->COUNT16.SYNCBUSY.reg & (TC_SYNCBUSY_SWRST | TC_SYNCBUSY_ENABLE | TC_SYNCBUSY_CTRLB | TC_SYNCBUSY_STATUS | TC_SYNCBUSY_COUNT));
+#else
+  while (TCx->COUNT16.STATUS.bit.SYNCBUSY);
 #endif
 }
 
@@ -71,27 +71,27 @@ void analogReadResolution(int res)
 {
   _readResolution = res;
   if (res > 10) {
-#if SAMD
-    ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_12BIT_Val;
-#elif SAMC21 
+#if SAMC
     ADC0->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_12BIT_Val;
     ADC1->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_12BIT_Val;
+#else
+    ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_12BIT_Val;
 #endif
     _ADCResolution = 12;
   } else if (res > 8) {
-#if SAMD
-    ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_10BIT_Val;
-#elif SAMC21 
+#if SAMC
     ADC0->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_10BIT_Val;
     ADC1->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_10BIT_Val;
+#else
+    ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_10BIT_Val;
 #endif
     _ADCResolution = 10;
   } else {
-#if SAMD
-    ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_8BIT_Val;
-#elif SAMC21 
+#if SAMC
     ADC0->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_8BIT_Val;
     ADC1->CTRLC.bit.RESSEL = ADC_CTRLC_RESSEL_8BIT_Val;
+#else
+    ADC->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_8BIT_Val;
 #endif
     _ADCResolution = 8;
   }
@@ -123,7 +123,17 @@ static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
 void analogReference(eAnalogReference mode)
 {
   syncADC();
-#if SAMD
+#if SAMC
+  if (mode == 0) {              // Set to 1.0V for the SAML, 1.024V for the SAMC
+    SUPC->VREF.reg &= ~SUPC_VREF_SEL_Msk;
+  } else if (mode > 5) {                // Values above 5 are used for the Supply Controller reference (AR_INTREF)
+    SUPC->VREF.reg &= ~SUPC_VREF_SEL_Msk;
+    SUPC->VREF.reg |= SUPC_VREF_SEL(mode - 6);  // 
+    mode = 0;
+  }
+  ADC0->REFCTRL.bit.REFSEL = mode;
+  ADC1->REFCTRL.bit.REFSEL = mode;
+#else
   switch (mode)
   {
     case AR_INTERNAL:
@@ -153,16 +163,6 @@ void analogReference(eAnalogReference mode)
       ADC->REFCTRL.bit.REFSEL = ADC_REFCTRL_REFSEL_INTVCC1_Val; // 1/2 VDDANA = 0.5* 3V3 = 1.65V
       break;
   }
-#elif SAMC
-  if (mode == 0) {              // Set to 1.0V for the SAML, 1.024V for the SAMC
-    SUPC->VREF.reg &= ~SUPC_VREF_SEL_Msk;
-  } else if (mode > 5) {                // Values above 5 are used for the Supply Controller reference (AR_INTREF)
-    SUPC->VREF.reg &= ~SUPC_VREF_SEL_Msk;
-    SUPC->VREF.reg |= SUPC_VREF_SEL(mode - 6);  // 
-    mode = 0;
-  }
-  ADC0->REFCTRL.bit.REFSEL = mode;
-  ADC1->REFCTRL.bit.REFSEL = mode;
 
 #endif
 }
@@ -175,7 +175,7 @@ uint32_t analogRead(uint32_t pin)
     pin += A0;
   }
 
-#if (SAMC21)
+#if SAMC
   Adc* ADC;
   if ( g_APinDescription[pin].ulPinType == PIO_ANALOG_ALT ) {
     ADC = ADC1;
@@ -308,12 +308,12 @@ void analogWrite(uint32_t pin, uint32_t value)
         GCLK_CLKCTRL_ID(GCM_TC6_TC7),   // TC7
 #endif
       };
-#if SAMD
-      GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_IDs[tcNum]);
-      while (GCLK->STATUS.bit.SYNCBUSY == 1);
-#elif SAMC
+#if SAMC
       GCLK->PCHCTRL[GCLK_CLKCTRL_IDs[tcNum]].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
       while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
+#else
+      GCLK->CLKCTRL.reg = (uint16_t) (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN_GCLK0 | GCLK_CLKCTRL_IDs[tcNum]);
+      while (GCLK->STATUS.bit.SYNCBUSY == 1);
 #endif
 
       // Set PORT
@@ -326,10 +326,10 @@ void analogWrite(uint32_t pin, uint32_t value)
         // Set Timer counter Mode to 16 bits, normal PWM
         TCx->COUNT16.CTRLA.reg |= TC_CTRLA_MODE_COUNT16;
         syncTC_16(TCx);
-#if SAMD
-        TCx->COUNT16.CTRLA.reg |= TC_CTRLA_WAVEGEN_NPWM;
-#elif SAMC21
+#if SAMC
         TCx->COUNT16.WAVE.reg = TC_WAVE_WAVEGEN_NPWM;
+#else
+        TCx->COUNT16.CTRLA.reg |= TC_CTRLA_WAVEGEN_NPWM;
 #endif
 
         // Set the initial value

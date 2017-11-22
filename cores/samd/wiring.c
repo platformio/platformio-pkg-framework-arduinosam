@@ -31,25 +31,22 @@ extern "C" {
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncADC() __attribute__((always_inline, unused));
 static void syncADC() {
-#if SAMD
-  while ( ADC->STATUS.bit.SYNCBUSY == 1 );
-#elif SAMC21
+
+#if SAMC21
   while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
 #else
-  #error "wiring.c: Unsupported chip"
+  while ( ADC->STATUS.bit.SYNCBUSY == 1 );
 #endif
 }
 
 // Wait for synchronization of registers between the clock domains
 static __inline__ void syncGCLK() __attribute__((always_inline, unused));
 static void syncGCLK() {
-#if SAMD
-  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
-#elif SAMC21
+#if SAMC21
   while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
 #else
-  #error "wiring.c: Unsupported chip"
+  while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
 #endif
 }
 
@@ -132,13 +129,7 @@ void init( void )
 
   // Initialize Analog Controller
   // Setting clock
-#if SAMD
-  while(GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
-
-  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_ADC ) | // Generic Clock ADC
-                      GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
-                      GCLK_CLKCTRL_CLKEN ;
-#elif SAMC21
+#if SAMC21
   SUPC->VREF.reg |= SUPC_VREF_VREFOE;           // Enable Supply Controller Reference output for use with ADC and DAC (AR_INTREF)
 
   while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
@@ -147,29 +138,17 @@ void init( void )
   ADC0->CTRLC.reg = ADC_CTRLC_RESSEL_10BIT | ADC_CTRLC_R2R;         // 10 bits resolution as default, R2R requires ADC_SAMPCTRL_OFFCOMP=1
   ADC1->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV256;   // Divide Clock by 256.
   ADC1->CTRLC.reg = ADC_CTRLC_RESSEL_10BIT | ADC_CTRLC_R2R;         // 10 bits resolution as default, R2R requires ADC_SAMPCTRL_OFFCOMP=1
+#else
+  while(GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
+
+  GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_ADC ) | // Generic Clock ADC
+                      GCLK_CLKCTRL_GEN_GCLK0     | // Generic Clock Generator 0 is source
+                      GCLK_CLKCTRL_CLKEN ;
 
 #endif
 
 
-#if SAMD
-  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
-
-  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV512 |    // Divide Clock by 512.
-                   ADC_CTRLB_RESSEL_10BIT;         // 10 bits resolution as default
-
-  ADC->SAMPCTRL.reg = 0x3f;                        // Set max Sampling Time Length
-
-  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
-
-  ADC->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
-
-  // Averaging (see datasheet table in AVGCTRL register description)
-  ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
-                     ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
-
-  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
-
-#elif SAMC21
+#if SAMC21
   ADC0->SAMPCTRL.reg = (ADC_SAMPCTRL_SAMPLEN(0x0) | ADC_SAMPCTRL_OFFCOMP);     // ADC_SAMPCTRL_SAMPLEN must be 0 when ADC_SAMPCTRL_OFFCOMP=1
   ADC1->SAMPCTRL.reg = (ADC_SAMPCTRL_SAMPLEN(0x0) | ADC_SAMPCTRL_OFFCOMP);     // ADC_SAMPCTRL_SAMPLEN must be 0 when ADC_SAMPCTRL_OFFCOMP=1
   // Wait for synchronization of registers between the clock domains
@@ -191,11 +170,38 @@ void init( void )
   while ( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
   while ( ADC1->SYNCBUSY.reg & ADC_SYNCBUSY_MASK );
 
+#else
+  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
+
+  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV512 |    // Divide Clock by 512.
+                   ADC_CTRLB_RESSEL_10BIT;         // 10 bits resolution as default
+
+  ADC->SAMPCTRL.reg = 0x3f;                        // Set max Sampling Time Length
+
+  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
+
+  ADC->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
+
+  // Averaging (see datasheet table in AVGCTRL register description)
+  ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
+                     ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+
+  while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
+
 #endif
 
   analogReference( AR_DEFAULT ) ; // Analog Reference is AREF pin (3.3v)
 
-#if SAMD
+#if SAMC21
+  while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
+
+  GCLK->PCHCTRL[GCM_DAC].reg = ( GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
+  while ( (GCLK->PCHCTRL[GCM_DAC].reg & GCLK_PCHCTRL_CHEN) == 0 );      // wait for sync
+
+  while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
+
+  DAC->CTRLB.reg = (DAC_CTRLB_REFSEL_AVCC | DAC_CTRLB_EOEN);
+#else
   // Initialize DAC
   // Setting clock
   while ( GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY );
@@ -206,15 +212,6 @@ void init( void )
   while ( DAC->STATUS.bit.SYNCBUSY == 1 ); // Wait for synchronization of registers between the clock domains
   DAC->CTRLB.reg = DAC_CTRLB_REFSEL_AVCC | // Using the 3.3V reference
                    DAC_CTRLB_EOEN ;        // External Output Enable (Vout)
-#elif SAMC21
-  while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK );
-
-  GCLK->PCHCTRL[GCM_DAC].reg = ( GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
-  while ( (GCLK->PCHCTRL[GCM_DAC].reg & GCLK_PCHCTRL_CHEN) == 0 );      // wait for sync
-
-  while ( DAC->SYNCBUSY.reg & DAC_SYNCBUSY_MASK );
-
-  DAC->CTRLB.reg = (DAC_CTRLB_REFSEL_AVCC | DAC_CTRLB_EOEN);
 #endif
 
 

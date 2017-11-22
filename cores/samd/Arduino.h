@@ -125,11 +125,11 @@ void loop( void ) ;
 #endif
 
 // USB Device
-#ifndef SAMC_SERIES
+#if !SAMC21
 #include "USB/USBDesc.h"
 #include "USB/USBCore.h"
 #include "USB/USBAPI.h"
 #include "USB/USB_host.h"
-#endif // SAMC_SERIES
+#endif // !SAMC21
 
 #endif // Arduino_h

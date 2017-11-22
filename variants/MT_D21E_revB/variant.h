@@ -30,7 +30,7 @@
  * The format is different than the stock Arduino SAMD core,
  * which uses ARDUINO_SAMD_VARIANT_COMPLIANCE instead.
  */
-#define MATTAIRTECH_ARDUINO_SAMD_VARIANT_COMPLIANCE 10608
+#define ARDUINO_SAMD_VARIANT_COMPLIANCE 10608
 
 /*----------------------------------------------------------------------------
  *        Clock Configuration

@@ -18,7 +18,7 @@
 
 #include "sam.h"
 
-#if (!SAMC_SERIES)
+#if !SAMC21
 
 #include <Arduino.h>
 
