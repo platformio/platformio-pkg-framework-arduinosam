@@ -662,16 +662,21 @@ void SERCOM::initClockNVIC( void )
     clockId = GCM_SERCOM3_CORE;
     IdNvic = SERCOM3_IRQn;
   }
+#ifdef SERCOM4
   else if(sercom == SERCOM4)
   {
     clockId = GCM_SERCOM4_CORE;
     IdNvic = SERCOM4_IRQn;
   }
+#endif // SERCOM4
+
+#ifdef SERCOM5
   else if(sercom == SERCOM5)
   {
     clockId = GCM_SERCOM5_CORE;
     IdNvic = SERCOM5_IRQn;
   }
+#endif // SERCOM5
 
   if ( IdNvic == PendSV_IRQn )
   {
@@ -683,6 +688,15 @@ void SERCOM::initClockNVIC( void )
   NVIC_EnableIRQ(IdNvic);
   NVIC_SetPriority (IdNvic, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority */
 
+
+#ifdef GCLK_PCHCTRL_CHEN
+  GCLK->PCHCTRL[clockId].reg = ( GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN_GCLK0 );
+  while ( GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_MASK )
+  {
+    /* Wait for synchronization */
+  }
+#else
+
   //Setting clock
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( clockId ) | // Generic Clock 0 (SERCOMx)
                       GCLK_CLKCTRL_GEN_GCLK0 | // Generic Clock Generator 0 is source
@@ -692,4 +706,5 @@ void SERCOM::initClockNVIC( void )
   {
     /* Wait for synchronization */
   }
+#endif
 }

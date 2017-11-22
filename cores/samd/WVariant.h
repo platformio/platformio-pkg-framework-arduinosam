@@ -94,7 +94,11 @@ extern const void* g_apTCInstances[TCC_INST_NUM+TC_INST_NUM] ;
 
 #define GetTCNumber( x ) ( (x) >> 8 )
 #define GetTCChannelNumber( x ) ( (x) & 0xff )
+#if SAMC_SERIES
+#define GetTC( x ) ( (((x) >> 3) & 0x01 ) == 0 ? g_apTCInstances[((x) >> 4) & 0x07] : (((((x) >> 4) & 0x07) == 4) ? TC4 : g_apTCInstances[(((x) >> 4) & 0x07) + TCC_INST_NUM]) )
+#else
 #define GetTC( x ) ( g_apTCInstances[(x) >> 8] )
+#endif
 
 // Definitions for PWM channels
 typedef enum _EPWMChannel
@@ -180,6 +184,7 @@ typedef enum _EPioType
   PIO_INPUT,            /* The pin is controlled by PORT and is an input. */
   PIO_INPUT_PULLUP,     /* The pin is controlled by PORT and is an input with internal pull-up resistor enabled. */
   PIO_OUTPUT,           /* The pin is controlled by PORT and is an output. */
+  PIO_ANALOG_ALT,       /* The pin uses the second ADC on the SAMC21 */
 
   PIO_PWM=PIO_TIMER,
   PIO_PWM_ALT=PIO_TIMER_ALT,
@@ -213,6 +218,51 @@ typedef struct _PinDescription
 /* Pins table to be instantiated into variant.cpp */
 extern const PinDescription g_APinDescription[] ;
 
+
+#if SAMC21_SERIES
+#define GCM_FDPLL96M_INPUT        (0x00U)
+#define GCM_FDPLL96M_32K          (0x01U)
+#define GCM_EIC                   (0x02U)
+#define GCM_FREQM_MEASURE         (0x03U)
+#define GCM_FREQM_REF             (0x04U)
+#define GCM_TSENS                 (0x05U)
+#define GCM_EVSYS_CHANNEL_0       (0x06U)
+#define GCM_EVSYS_CHANNEL_1       (0x07U)
+#define GCM_EVSYS_CHANNEL_2       (0x08U)
+#define GCM_EVSYS_CHANNEL_3       (0x09U)
+#define GCM_EVSYS_CHANNEL_4       (0x0AU)
+#define GCM_EVSYS_CHANNEL_5       (0x0BU)
+#define GCM_EVSYS_CHANNEL_6       (0x0CU)
+#define GCM_EVSYS_CHANNEL_7       (0x0DU)
+#define GCM_EVSYS_CHANNEL_8       (0x0EU)
+#define GCM_EVSYS_CHANNEL_9       (0x0FU)
+#define GCM_EVSYS_CHANNEL_10      (0x10U)
+#define GCM_EVSYS_CHANNEL_11      (0x11U)
+#define GCM_SERCOMx_SLOW          (0x12U)
+#define GCM_SERCOM0_CORE          (0x13U)
+#define GCM_SERCOM1_CORE          (0x14U)
+#define GCM_SERCOM2_CORE          (0x15U)
+#define GCM_SERCOM3_CORE          (0x16U)
+#define GCM_SERCOM4_CORE          (0x17U)
+#define GCM_SERCOM5_SLOW          (0x18U)
+#define GCM_SERCOM5_CORE          (0x19U)
+#define GCM_CAN0                  (0x1AU)
+#define GCM_CAN1                  (0x1BU)
+#define GCM_TCC0_TCC1             (0x1CU)
+#define GCM_TCC2                  (0x1DU)
+#define GCM_TC0_TC1               (0x1EU)
+#define GCM_TC2_TC3               (0x1FU)
+#define GCM_TC4                   (0x20U)
+#define GCM_ADC0                  (0x21U)
+#define GCM_ADC1                  (0x22U)
+#define GCM_SDADC                 (0x23U)
+#define GCM_AC                    (0x22U)
+#define GCM_DAC                   (0x24U)
+#define GCM_PTC                   (0x25U)
+#define GCM_CCL                   (0x26U)
+#define GCM_NVMCTRL               (0x27U)
+
+#else
 /* Generic Clock Multiplexer IDs */
 #define GCM_DFLL48M_REF           (0x00U)
 #define GCM_FDPLL96M_INPUT        (0x01U)
@@ -251,6 +301,8 @@ extern const PinDescription g_APinDescription[] ;
 #define GCM_PTC                   (0x22U)
 #define GCM_I2S_0                 (0x23U)
 #define GCM_I2S_1                 (0x24U)
+#endif
+
 
 #ifdef __cplusplus
 } // extern "C"

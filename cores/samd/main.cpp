@@ -39,7 +39,7 @@ int main( void )
   initVariant();
 
   delay(1);
-#if defined(USBCON)
+#if defined(USBCON) && !defined(USB_DISABLED)
   USBDevice.init();
   USBDevice.attach();
 #endif

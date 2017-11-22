@@ -209,6 +209,110 @@
 /* Entire SAMD family */
 #define SAML_SERIES (SAML21A_SERIES || SAML21B_SERIES)
 
+
+
+/* SAMC21 series */
+#define SAMC21E15 ( \
+    part_is_defined( SAMC21E15A ) )
+
+#define SAMC21E16 ( \
+    part_is_defined( SAMC21E16A ) )
+
+#define SAMC21E17 ( \
+    part_is_defined( SAMC21E17A ) )
+
+#define SAMC21E18 ( \
+    part_is_defined( SAMC21E18A ) )
+
+#define SAMC21G15 ( \
+    part_is_defined( SAMC21G15A ) )
+
+#define SAMC21G16 ( \
+    part_is_defined( SAMC21G16A ) )
+
+#define SAMC21G17 ( \
+    part_is_defined( SAMC21G17A ) )
+
+#define SAMC21G18 ( \
+    part_is_defined( SAMC21G18A ) )
+
+#define SAMC21J15 ( \
+    part_is_defined( SAMC21J15A ) )
+
+#define SAMC21J16 ( \
+    part_is_defined( SAMC21J16A ) )
+
+#define SAMC21J17 ( \
+    part_is_defined( SAMC21J17A ) )
+
+#define SAMC21J18 ( \
+    part_is_defined( SAMC21J18A ) )
+
+/* Entire SAMC21E series */
+#define SAMC21E_SERIES (SAMC21E15 || SAMC21E16 || SAMC21E17 || SAMC21E18)
+#define SAMC21E	SAMC21E_SERIES
+
+/* Entire SAMC21G series */
+#define SAMC21G_SERIES (SAMC21G15 || SAMC21G16 || SAMC21G17 || SAMC21G18)
+#define SAMC21G	SAMC21G_SERIES
+
+/* Entire SAMC21J series */
+#define SAMC21J_SERIES (SAMC21J15 || SAMC21J16 || SAMC21J17 || SAMC21J18)
+#define SAMC21J	SAMC21J_SERIES
+
+/* Entire SAMC21 series */
+#define SAMC21_SERIES (SAMC21E15 || SAMC21E16 || SAMC21E17 || SAMC21E18 || SAMC21G15 || SAMC21G16 || SAMC21G17 || SAMC21G18 || SAMC21J15 || SAMC21J16 || SAMC21J17 || SAMC21J18)
+#define SAMC21	SAMC21_SERIES
+
+/* Entire SAMC family */
+#define SAMC_SERIES (SAMC21_SERIES)
+#define SAMC SAMC_SERIES
+
+
+
+/*
+ * ----------------------------------------------------------------------------
+ * SAMC family
+ * ----------------------------------------------------------------------------
+ */
+
+/* SAMC21 series */
+/*
+#define SAMC21E15A ( \
+    part_is_defined( SAMC21E15A ) )
+#define SAMC21E16A ( \
+    part_is_defined( SAMC21E16A ) )
+#define SAMC21E17A ( \
+    part_is_defined( SAMC21E17A ) )
+#define SAMC21E18A ( \
+    part_is_defined( SAMC21E18A ) )
+
+#define SAMC21G15A ( \
+    part_is_defined( SAMC21G15A ) )
+#define SAMC21G16A ( \
+    part_is_defined( SAMC21G16A ) )
+#define SAMC21G17A ( \
+    part_is_defined( SAMC21G17A ) )
+#define SAMC21G18A ( \
+    part_is_defined( SAMC21G18A ) )
+
+#define SAMC21J15A ( \
+    part_is_defined( SAMC21J15A ) )
+#define SAMC21J16A ( \
+    part_is_defined( SAMC21J16A ) )
+#define SAMC21J17A ( \
+    part_is_defined( SAMC21J17A ) )
+#define SAMC21J18A ( \
+    part_is_defined( SAMC21J18A ) )
+
+*/
+/* Entire SAMC21 series */
+//#define SAMC21_SERIES (SAMC21E15A || SAMC21E16A || SAMC21E17A || SAMC21E18A || SAMC21G15A || SAMC21G16A || SAMC21G17A || SAMC21G18A || SAMC21J15A || SAMC21J16A || SAMC21J17A || SAMC21J18A)
+
+/* Entire SAMC family */
+//#define SAMC_SERIES (SAMC21_SERIES)
+
+
 /*
  * ----------------------------------------------------------------------------
  * SAMS family
@@ -450,7 +554,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define SAM (SAM4_SERIES || SAMR_SERIES || SAM3_SERIES || SAMS_SERIES || SAME_SERIES || SAMD_SERIES || SAML_SERIES || SAMG_SERIES)
+#define SAM (SAM4_SERIES || SAMR_SERIES || SAM3_SERIES || SAMS_SERIES || SAME_SERIES || SAMD_SERIES || SAML_SERIES || SAMG_SERIES || SAMC_SERIES)
 
 /*
  * ----------------------------------------------------------------------------
@@ -473,6 +577,10 @@
 #if SAML_SERIES
 #include "saml.h"
 #endif /* SAML_SERIES */
+
+#if SAMC_SERIES
+#include "samc.h"
+#endif /* SAMC_SERIES */
 
 #if SAMS_SERIES
 #include "sams.h"

@@ -72,6 +72,19 @@ void DAC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void PTC_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 void I2S_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
 
+/* These are for the SAMC21 */
+void SYSTEM_Handler   (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void FREQM_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TSENS_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void CAN0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void CAN1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC0_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void TC2_Handler      (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void ADC0_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void ADC1_Handler     (void) __attribute__ ((weak, alias("Dummy_Handler")));
+void SDADC_Handler    (void) __attribute__ ((weak, alias("Dummy_Handler")));
+
+
 /* Initialize segments */
 extern uint32_t __etext;
 extern uint32_t __data_start__;
@@ -103,6 +116,40 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) SysTick_Handler,
 
   /* Configurable interrupts */
+#if SAMC21
+  (void*) SYSTEM_Handler,         /*  0 SYSTEM handler (includes SYSTEM, MCLK, OSCCTRL, OSC32KCTRL, PAC, PM, SUPC, and TAL) */
+  (void*) WDT_Handler,            /*  1 Watchdog Timer */
+  (void*) RTC_Handler,            /*  2 Real-Time Counter */
+  (void*) EIC_Handler,            /*  3 External Interrupt Controller */
+  (void*) FREQM_Handler,          /*  4 FREQM */
+  (void*) TSENS_Handler,          /*  5 TSENS */
+  (void*) NVMCTRL_Handler,        /*  4 / 6 Non-Volatile Memory Controller */
+  (void*) DMAC_Handler,           /*  5 / 7 Direct Memory Access Controller */
+  (void*) EVSYS_Handler,          /*  7 / 8 Event System Interface */
+  (void*) SERCOM0_Handler,        /*  8 / 9 Serial Communication Interface 0 */
+  (void*) SERCOM1_Handler,        /*  9 / 10 Serial Communication Interface 1 */
+  (void*) SERCOM2_Handler,        /* 10 / 11 Serial Communication Interface 2 */
+  (void*) SERCOM3_Handler,        /* 11 / 12 Serial Communication Interface 3 */
+  (void*) SERCOM4_Handler,        /* 12 / 13 Serial Communication Interface 4 */
+  (void*) SERCOM5_Handler,        /* 13 / 14 Serial Communication Interface 5 */
+  (void*) CAN0_Handler,           /* 15 CAN0 */
+  (void*) CAN1_Handler,           /* 16 CAN1 */
+  (void*) TCC0_Handler,           /* 14 / 17 Timer Counter Control 0 */
+  (void*) TCC1_Handler,           /* 15 / 18 Timer Counter Control 1 */
+  (void*) TCC2_Handler,           /* 16 / 19 Timer Counter Control 2 */
+  (void*) TC0_Handler,            /* 17 / 20 Basic Timer Counter 0 */
+  (void*) TC1_Handler,            /* 18 / 21 Basic Timer Counter 1 */
+  (void*) TC2_Handler,            /* 19 / 22 Basic Timer Counter 2 */
+  (void*) TC3_Handler,            /* 20 / 23 Basic Timer Counter 3 */
+  (void*) TC4_Handler,            /* 21 / 24 Basic Timer Counter 4 */
+  (void*) ADC0_Handler,           /* 25 ADC0 */
+  (void*) ADC1_Handler,           /* 26 ADC1 */
+  (void*) AC_Handler,             /* 23 / 27 Analog Comparators */
+  (void*) DAC_Handler,            /* 24 / 28 Digital Analog Converter */
+  (void*) SDADC_Handler,          /* 29 SDADC */
+  (void*) PTC_Handler,            /* 25 / 30 Peripheral Touch Controller */
+
+#else   // SAMC21
   (void*) PM_Handler,             /*  0 Power Manager */
   (void*) SYSCTRL_Handler,        /*  1 System Control */
   (void*) WDT_Handler,            /*  2 Watchdog Timer */
@@ -132,6 +179,8 @@ __attribute__ ((section(".isr_vector"))) const DeviceVectors exception_table =
   (void*) PTC_Handler,            /* 26 Peripheral Touch Controller */
   (void*) I2S_Handler,            /* 27 Inter-IC Sound Interface */
   (void*) (0UL),                  /* Reserved */
+#endif  // SAMC21
+    
 };
 
 extern int main(void);
