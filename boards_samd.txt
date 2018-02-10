@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2015 Arduino LLC.  All right reserved.
+# Copyright (c) 2014-2017 Arduino LLC.  All right reserved.
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -135,7 +135,7 @@ mkr1000.bootloader.file=mkr1000/samd21_sam_ba_arduino_mkr1000.bin
 
 # Arduino MKRZero
 # ---------------
-mkrzero.name=Arduino MKRZero
+mkrzero.name=Arduino MKRZERO
 mkrzero.vid.0=0x2341
 mkrzero.pid.0=0x804f
 mkrzero.vid.1=0x2341
@@ -162,9 +162,9 @@ mkrzero.build.pid=0x804f
 mkrzero.bootloader.tool=openocd
 mkrzero.bootloader.file=mkrzero/samd21_sam_ba_arduino_mkrzero.bin
 
-# Arduino MKRFox1200
-# ---------------
-mkrfox1200.name=Arduino MKRFox1200
+# Arduino MKR FOX 1200
+# --------------------
+mkrfox1200.name=Arduino MKR FOX 1200
 mkrfox1200.vid.0=0x2341
 mkrfox1200.pid.0=0x8050
 mkrfox1200.vid.1=0x2341
@@ -178,7 +178,7 @@ mkrfox1200.upload.wait_for_upload_port=true
 mkrfox1200.upload.native_usb=true
 mkrfox1200.build.mcu=cortex-m0plus
 mkrfox1200.build.f_cpu=48000000L
-mkrfox1200.build.usb_product="Arduino MKRFox1200"
+mkrfox1200.build.usb_product="Arduino MKR FOX 1200"
 mkrfox1200.build.usb_manufacturer="Arduino LLC"
 mkrfox1200.build.board=SAMD_MKRFox1200
 mkrfox1200.build.core=arduino
@@ -190,6 +190,64 @@ mkrfox1200.build.vid=0x2341
 mkrfox1200.build.pid=0x8050
 mkrfox1200.bootloader.tool=openocd
 mkrfox1200.bootloader.file=mkrfox1200/samd21_sam_ba_arduino_mkrfox1200.bin
+
+# Arduino MKR GSM 1400
+# --------------------
+mkrgsm1400.name=Arduino MKR GSM 1400
+mkrgsm1400.vid.0=0x2341
+mkrgsm1400.pid.0=0x8052
+mkrgsm1400.vid.1=0x2341
+mkrgsm1400.pid.1=0x0052
+
+mkrgsm1400.upload.tool=bossac
+mkrgsm1400.upload.protocol=sam-ba
+mkrgsm1400.upload.maximum_size=262144
+mkrgsm1400.upload.use_1200bps_touch=true
+mkrgsm1400.upload.wait_for_upload_port=true
+mkrgsm1400.upload.native_usb=true
+mkrgsm1400.build.mcu=cortex-m0plus
+mkrgsm1400.build.f_cpu=48000000L
+mkrgsm1400.build.usb_product="Arduino MKR GSM 1400"
+mkrgsm1400.build.usb_manufacturer="Arduino LLC"
+mkrgsm1400.build.board=SAMD_MKRGSM1400
+mkrgsm1400.build.core=arduino
+mkrgsm1400.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags} -DUSE_BQ24195L_PMIC
+mkrgsm1400.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkrgsm1400.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkrgsm1400.build.variant=mkrgsm1400
+mkrgsm1400.build.vid=0x2341
+mkrgsm1400.build.pid=0x8052
+mkrgsm1400.bootloader.tool=openocd
+mkrgsm1400.bootloader.file=mkrgsm1400/samd21_sam_ba_arduino_mkrgsm1400.bin
+
+# Arduino MKR WAN 1300
+# --------------------
+mkrwan1300.name=Arduino MKR WAN 1300
+mkrwan1300.vid.0=0x2341
+mkrwan1300.pid.0=0x8053
+mkrwan1300.vid.1=0x2341
+mkrwan1300.pid.1=0x0053
+
+mkrwan1300.upload.tool=bossac
+mkrwan1300.upload.protocol=sam-ba
+mkrwan1300.upload.maximum_size=262144
+mkrwan1300.upload.use_1200bps_touch=true
+mkrwan1300.upload.wait_for_upload_port=true
+mkrwan1300.upload.native_usb=true
+mkrwan1300.build.mcu=cortex-m0plus
+mkrwan1300.build.f_cpu=48000000L
+mkrwan1300.build.usb_product="Arduino MKR WAN 1300"
+mkrwan1300.build.usb_manufacturer="Arduino LLC"
+mkrwan1300.build.board=SAMD_MKRWAN1300
+mkrwan1300.build.core=arduino
+mkrwan1300.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
+mkrwan1300.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkrwan1300.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkrwan1300.build.variant=mkrwan1300
+mkrwan1300.build.vid=0x2341
+mkrwan1300.build.pid=0x8053
+mkrwan1300.bootloader.tool=openocd
+mkrwan1300.bootloader.file=mkrwan1300/samd21_sam_ba_arduino_mkrwan1300.bin
 
 # Adafruit Circuit Playground M0
 # ------------------------------
