@@ -16,6 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#if defined(USBCON)
+
 #include <Arduino.h>
 
 #include "SAMD21_USBDevice.h"
@@ -452,7 +454,9 @@ void USBDeviceClass::initEP(uint32_t ep, uint32_t config)
 	}
 	else if (config == (USB_ENDPOINT_TYPE_BULK | USB_ENDPOINT_OUT(0)))
 	{
-		epHandlers[ep] = new DoubleBufferedEPOutHandler(usbd, ep, 256);
+		if (epHandlers[ep] == NULL) {
+			epHandlers[ep] = new DoubleBufferedEPOutHandler(usbd, ep, 256);
+		}
 	}
 	else if (config == (USB_ENDPOINT_TYPE_BULK | USB_ENDPOINT_IN(0)))
 	{
@@ -968,3 +972,4 @@ void USBDeviceClass::ISRHandler()
 // USBDevice class instance
 USBDeviceClass USBDevice;
 
+#endif
