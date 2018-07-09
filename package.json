@@ -3,5 +3,5 @@
     "description": "Arduino Wiring-based Framework (SAM & SAMD Cores)",
     "system": "*",
     "url": "http://arduino.cc/en/Reference/HomePage",
-    "version": "2.10618.1"
+    "version": "3.10618.0"
 }
