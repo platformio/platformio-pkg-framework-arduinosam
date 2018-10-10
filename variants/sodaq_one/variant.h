@@ -19,8 +19,8 @@
 #ifndef _VARIANT_SODAQ_ONE_
 #define _VARIANT_SODAQ_ONE_
 
-// The definitions here needs a SAMD core >=1.6.3
-#define ARDUINO_SAMD_VARIANT_COMPLIANCE 10603
+// The definitions here needs a SAMD core >=1.6.10
+#define ARDUINO_SAMD_VARIANT_COMPLIANCE 10610
 
 /*----------------------------------------------------------------------------
  *        Definitions
@@ -79,9 +79,6 @@ extern "C"
  * https://github.com/arduino/Arduino/issues/1833
  */
 // #define digitalPinToTimer(P)
-
-// Interrupts
-#define digitalPinToInterrupt(P)   ( g_APinDescription[P].ulExtInt )
 
 // LEDs
 #define PIN_LED_RED          (14u)
@@ -145,6 +142,7 @@ static const uint8_t GPS_ENABLE    = (18u);
 static const uint8_t BUTTON        = (19u);
 static const uint8_t ACCEL_INT1    = (4u);
 static const uint8_t ACCEL_INT2    = (5u);
+static const uint8_t MAG_INT       = (50u);
 static const uint8_t ENABLE_PIN_IO = (20u);
 static const uint8_t SWITCH_SENSE  = (21u);
 
