@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_FEATHER_M4_
-#define _VARIANT_FEATHER_M4_
+#ifndef _VARIANT_TRELLIS_M4_
+#define _VARIANT_TRELLIS_M4_
 
 // The definitions here needs a SAMD core >=1.6.10
 #define ARDUINO_SAMD_VARIANT_COMPLIANCE 10610
@@ -57,11 +57,11 @@ extern "C"
  *----------------------------------------------------------------------------*/
 
 // Number of pins defined in PinDescription array
-#define PINS_COUNT           (40u)
-#define NUM_DIGITAL_PINS     (20u)
-#define NUM_ANALOG_INPUTS    (6u)
-#define NUM_ANALOG_OUTPUTS   (1u)
-#define analogInputToDigitalPin(p)  ((p < 6u) ? (p) + 14u : -1)
+#define PINS_COUNT           (32u)
+#define NUM_DIGITAL_PINS     (30u)
+#define NUM_ANALOG_INPUTS    (3u)
+#define NUM_ANALOG_OUTPUTS   (2u)
+#define analogInputToDigitalPin(p)  ((p < NUM_ANALOG_INPUTS) ? (p) + PIN_A0 : -1)
 
 #define digitalPinToPort(P)        ( &(PORT->Group[g_APinDescription[P].ulPort]) )
 #define digitalPinToBitMask(P)     ( 1 << g_APinDescription[P].ulPin )
@@ -82,26 +82,25 @@ extern "C"
 
 // LEDs
 #define PIN_LED_13           (13u)
-#define PIN_LED_RXL          (25u)
-#define PIN_LED_TXL          (26u)
 #define PIN_LED              PIN_LED_13
-#define PIN_LED2             PIN_LED_RXL
-#define PIN_LED3             PIN_LED_TXL
 #define LED_BUILTIN          PIN_LED_13
 
 /*
  * Analog pins
  */
-#define PIN_A0               (14ul)
+#define PIN_A0               (29ul)
 #define PIN_A1               (PIN_A0 + 1)
 #define PIN_A2               (PIN_A0 + 2)
 #define PIN_A3               (PIN_A0 + 3)
 #define PIN_A4               (PIN_A0 + 4)
 #define PIN_A5               (PIN_A0 + 5)
-#define PIN_A6               (PIN_A0 + 6)
 
-#define PIN_DAC0             (14ul)
+#define PIN_DAC0             PIN_A0
 #define PIN_DAC1             PIN_A1
+#define PIN_MIC              PIN_A2
+#define PIN_MIC_RAW          PIN_A3
+#define PIN_LINE_LEFT        (21ul)
+#define PIN_LINE_RIGHT       (22ul)
 
 static const uint8_t A0  = PIN_A0;
 static const uint8_t A1  = PIN_A1;
@@ -109,84 +108,87 @@ static const uint8_t A2  = PIN_A2;
 static const uint8_t A3  = PIN_A3;
 static const uint8_t A4  = PIN_A4;
 static const uint8_t A5  = PIN_A5;
-static const uint8_t A6  = PIN_A6 ;
 
 static const uint8_t DAC0 = PIN_DAC0;
 static const uint8_t DAC1 = PIN_DAC1;
 
-#define ADC_RESOLUTION		12
+static const uint8_t MIC_RAW = PIN_MIC_RAW;
+static const uint8_t MIC = PIN_MIC;
+static const uint8_t LINE_LEFT = PIN_LINE_LEFT;
+static const uint8_t LINE_RIGHT = PIN_LINE_RIGHT;
 
-// Other pins
-#define PIN_ATN              (31ul)
-static const uint8_t ATN = PIN_ATN;
+#define ADC_RESOLUTION		12
 
 /*
  * Serial interfaces
  */
 
 // Serial1
-#define PIN_SERIAL1_RX       (0ul)
-#define PIN_SERIAL1_TX       (1ul)
+#define PIN_SERIAL1_RX       (22ul)
+#define PIN_SERIAL1_TX       (21ul)
 #define PAD_SERIAL1_RX       (SERCOM_RX_PAD_1)
 #define PAD_SERIAL1_TX       (UART_TX_PAD_0)
 
 /*
  * SPI Interfaces
  */
-#define SPI_INTERFACES_COUNT 1
+#define SPI_INTERFACES_COUNT     1
 
-#define PIN_SPI_MISO         (23u)
-#define PIN_SPI_MOSI         (24u)
-#define PIN_SPI_SCK          (25u)
-#define PERIPH_SPI           sercom1
-#define PAD_SPI_TX           SPI_PAD_3_SCK_1
-#define PAD_SPI_RX           SERCOM_RX_PAD_2
+#define PIN_SPI_SCK          (9u)   // COL7
+#define PIN_SPI_MOSI         (8u)   // COL6 
+#define PIN_SPI_MISO         (7u)   // COL5
+#define PERIPH_SPI           sercom3
+#define PAD_SPI_TX           SPI_PAD_0_SCK_1
+#define PAD_SPI_RX           SERCOM_RX_PAD_3
 
-static const uint8_t SS	  = 9 ;	// SERCOM1 last PAD is present on d9 but HW SS isn't used. Set here only for reference.
+static const uint8_t SS	  = PIN_A2 ;	
 static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;
 
+
 /*
  * Wire Interfaces
  */
-#define WIRE_INTERFACES_COUNT 1
+#define WIRE_INTERFACES_COUNT 2
 
 #define PIN_WIRE_SDA         (21u)
 #define PIN_WIRE_SCL         (22u)
-#define PERIPH_WIRE          sercom2
-#define WIRE_IT_HANDLER      SERCOM2_Handler
-
+#define PERIPH_WIRE          sercom4
+#define WIRE_IT_HANDLER      SERCOM4_Handler
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
+
+
+#define PIN_WIRE1_SDA         (0u)
+#define PIN_WIRE1_SCL         (1u)
+#define PERIPH_WIRE1          sercom2
+#define WIRE1_IT_HANDLER      SERCOM2_Handler
+static const uint8_t SDA1 = PIN_WIRE_SDA;
+static const uint8_t SCL1 = PIN_WIRE_SCL;
 
 /*
  * USB
  */
-#define PIN_USB_HOST_ENABLE (28ul)
-#define PIN_USB_DM          (29ul)
-#define PIN_USB_DP          (30ul)
+#define PIN_USB_HOST_ENABLE (13ul)
+#define PIN_USB_DM          (19ul)
+#define PIN_USB_DP          (20ul)
 
 /*
  * I2S Interfaces
  */
-#define I2S_INTERFACES_COUNT 1
+#define I2S_INTERFACES_COUNT 0
 
 #define I2S_DEVICE          0
-#define I2S_CLOCK_GENERATOR 3
-
-#define PIN_I2S_SDO          (5u)
-#define PIN_I2S_SDI          PIN_SPI_MOSI
-#define PIN_I2S_SCK          PIN_A2
-#define PIN_I2S_FS           PIN_SPI_MISO
+// no I2S on G19!
 
 //QSPI Pins
-#define PIN_QSPI_SCK    (34u)
-#define PIN_QSPI_CS     (35u)
-#define PIN_QSPI_IO0    (36u)
-#define PIN_QSPI_IO1    (37u)
-#define PIN_QSPI_IO2    (38u)
-#define PIN_QSPI_IO3    (39u)
+#define PIN_QSPI_SCK	(23u)
+#define PIN_QSPI_CS	(24u)
+#define PIN_QSPI_IO0	(25u)
+#define PIN_QSPI_IO1	(26u)
+#define PIN_QSPI_IO2	(27u)
+#define PIN_QSPI_IO3	(28u)
 
 //TODO: meaningful value for this
 #define VARIANT_QSPI_BAUD_DEFAULT 5000000
@@ -233,9 +235,9 @@ extern Uart Serial1;
 //                            pins are NOT connected to anything by default.
 #define SERIAL_PORT_USBVIRTUAL      Serial
 #define SERIAL_PORT_MONITOR         Serial
-// Serial has no physical pins broken out, so it's not listed as HARDWARE port
 #define SERIAL_PORT_HARDWARE        Serial1
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 
-#endif /* _VARIANT_FEATHER_M4_ */
+
+#endif /* _VARIANT_MERTO_M4_ */
 

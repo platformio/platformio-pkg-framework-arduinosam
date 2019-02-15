@@ -79,13 +79,15 @@ void init( void )
 //  PM->APBAMASK.reg |= PM_APBAMASK_EIC ;
 
 #if defined(__SAMD51__)
-  MCLK->APBAMASK.reg |= MCLK_APBAMASK_SERCOM0 | MCLK_APBAMASK_SERCOM1;
+  MCLK->APBAMASK.reg |= MCLK_APBAMASK_SERCOM0 | MCLK_APBAMASK_SERCOM1 | MCLK_APBAMASK_TC0 | MCLK_APBAMASK_TC1;
   
   MCLK->APBBMASK.reg |= MCLK_APBBMASK_SERCOM2 | MCLK_APBBMASK_SERCOM3 | MCLK_APBBMASK_TCC0 | MCLK_APBBMASK_TCC1 | MCLK_APBBMASK_TC3 | MCLK_APBBMASK_TC2;
   
-  MCLK->APBCMASK.reg |= MCLK_APBCMASK_TCC2 | MCLK_APBCMASK_TC4 | MCLK_APBCMASK_TC5;
+  MCLK->APBCMASK.reg |= MCLK_APBCMASK_TCC2 | MCLK_APBCMASK_TCC3 | MCLK_APBCMASK_TC4 | MCLK_APBCMASK_TC5;
   
-  MCLK->APBDMASK.reg |= MCLK_APBDMASK_DAC | MCLK_APBDMASK_SERCOM4 | MCLK_APBDMASK_SERCOM5 | MCLK_APBDMASK_ADC0 | MCLK_APBDMASK_ADC1;
+  MCLK->APBDMASK.reg |= MCLK_APBDMASK_DAC | MCLK_APBDMASK_SERCOM4 | MCLK_APBDMASK_SERCOM5 | MCLK_APBDMASK_ADC0 | MCLK_APBDMASK_ADC1 | MCLK_APBDMASK_TCC4
+		  | MCLK_APBDMASK_TC6 | MCLK_APBDMASK_TC7 | MCLK_APBDMASK_SERCOM6 | MCLK_APBDMASK_SERCOM7;
+
 #else
   // Clock SERCOM for Serial
   PM->APBCMASK.reg |= PM_APBCMASK_SERCOM0 | PM_APBCMASK_SERCOM1 | PM_APBCMASK_SERCOM2 | PM_APBCMASK_SERCOM3 | PM_APBCMASK_SERCOM4 | PM_APBCMASK_SERCOM5 ;
@@ -109,26 +111,31 @@ void init( void )
   // Initialize Analog Controller
   // Setting clock
 #if defined(__SAMD51__)
+  //set to 1/(1/(48000000/32) * 6) = 250000 SPS
 	GCLK->PCHCTRL[ADC0_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK1_Val | (1 << GCLK_PCHCTRL_CHEN_Pos); //use clock generator 1 (48Mhz)
-	
-	ADC0->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV256_Val;
-	ADC0->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_10BIT_Val;
-	
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
-	
-	ADC0->SAMPCTRL.reg = 0x3f;                        // Set max Sampling Time Length
-	
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
-	
-	ADC0->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
-	
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL );  //wait for sync
-	
-	// Averaging (see datasheet table in AVGCTRL register description)
-	ADC0->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
-						ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
-						
-	while( ADC0->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
+	GCLK->PCHCTRL[ADC1_GCLK_ID].reg = GCLK_PCHCTRL_GEN_GCLK1_Val | (1 << GCLK_PCHCTRL_CHEN_Pos); //use clock generator 1 (48Mhz)
+	Adc *adcs[] = {ADC0, ADC1};
+		for(int i=0; i<2; i++){
+
+		adcs[i]->CTRLA.bit.PRESCALER = ADC_CTRLA_PRESCALER_DIV32_Val;
+		adcs[i]->CTRLB.bit.RESSEL = ADC_CTRLB_RESSEL_10BIT_Val;
+
+		while( adcs[i]->SYNCBUSY.reg & ADC_SYNCBUSY_CTRLB );  //wait for sync
+
+		adcs[i]->SAMPCTRL.reg = 5;                        // sampling Time Length
+
+		while( adcs[i]->SYNCBUSY.reg & ADC_SYNCBUSY_SAMPCTRL );  //wait for sync
+
+		adcs[i]->INPUTCTRL.reg = ADC_INPUTCTRL_MUXNEG_GND;   // No Negative input (Internal Ground)
+
+		while( adcs[i]->SYNCBUSY.reg & ADC_SYNCBUSY_INPUTCTRL );  //wait for sync
+
+		// Averaging (see datasheet table in AVGCTRL register description)
+		adcs[i]->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |    // 1 sample only (no oversampling nor averaging)
+							ADC_AVGCTRL_ADJRES(0x0ul);   // Adjusting result by 0
+
+		while( adcs[i]->SYNCBUSY.reg & ADC_SYNCBUSY_AVGCTRL );  //wait for sync
+	}
 
 	analogReference( AR_DEFAULT ) ; // Analog Reference is AREF pin (3.3v)
 	
@@ -146,6 +153,8 @@ void init( void )
 	DAC->DACCTRL[1].bit.REFRESH = 2;
 
 #else
+  //set to 1/(1/(48000000/32) * 6) = 250000 SPS
+
   while(GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY);
 
   GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID( GCM_ADC ) | // Generic Clock ADC
@@ -154,10 +163,10 @@ void init( void )
 
   while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
 
-  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV512 |    // Divide Clock by 512.
+  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV32 |    // Divide Clock by 32.
                    ADC_CTRLB_RESSEL_10BIT;         // 10 bits resolution as default
 
-  ADC->SAMPCTRL.reg = 0x3f;                        // Set max Sampling Time Length
+  ADC->SAMPCTRL.reg = 5;                        // Sampling Time Length
 
   while( ADC->STATUS.bit.SYNCBUSY == 1 );          // Wait for synchronization of registers between the clock domains
 
