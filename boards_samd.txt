@@ -43,7 +43,7 @@ arduino_zero_edbg.bootloader.tool=openocd
 arduino_zero_edbg.bootloader.file=zero/samd21_sam_ba.bin
 
 # Arduino/Genuino Zero (Native USB Port)
-# ---------------------------------------
+# --------------------------------------
 arduino_zero_native.name=Arduino/Genuino Zero (Native USB Port)
 arduino_zero_native.vid.0=0x2341
 arduino_zero_native.pid.0=0x804d
@@ -89,7 +89,7 @@ arduino_zero_native.bootloader.tool=openocd
 arduino_zero_native.bootloader.file=zero/samd21_sam_ba.bin
 
 # Arduino/Genuino MKR1000
-# ---------------------------------------
+# -----------------------
 mkr1000.name=Arduino/Genuino MKR1000
 mkr1000.vid.0=0x2341
 mkr1000.pid.0=0x804e
@@ -124,7 +124,7 @@ mkr1000.build.usb_product="Arduino MKR1000"
 mkr1000.build.usb_manufacturer="Arduino LLC"
 mkr1000.build.board=SAMD_MKR1000
 mkr1000.build.core=arduino
-mkr1000.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
+mkr1000.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags}
 mkr1000.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
 mkr1000.build.openocdscript=openocd_scripts/arduino_zero.cfg
 mkr1000.build.variant=mkr1000
@@ -153,7 +153,7 @@ mkrzero.build.usb_product="Arduino MKRZero"
 mkrzero.build.usb_manufacturer="Arduino LLC"
 mkrzero.build.board=SAMD_MKRZERO
 mkrzero.build.core=arduino
-mkrzero.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
+mkrzero.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags}
 mkrzero.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
 mkrzero.build.openocdscript=openocd_scripts/arduino_zero.cfg
 mkrzero.build.variant=mkrzero
@@ -161,93 +161,6 @@ mkrzero.build.vid=0x2341
 mkrzero.build.pid=0x804f
 mkrzero.bootloader.tool=openocd
 mkrzero.bootloader.file=mkrzero/samd21_sam_ba_arduino_mkrzero.bin
-
-# Arduino MKR FOX 1200
-# --------------------
-mkrfox1200.name=Arduino MKR FOX 1200
-mkrfox1200.vid.0=0x2341
-mkrfox1200.pid.0=0x8050
-mkrfox1200.vid.1=0x2341
-mkrfox1200.pid.1=0x0050
-
-mkrfox1200.upload.tool=bossac
-mkrfox1200.upload.protocol=sam-ba
-mkrfox1200.upload.maximum_size=262144
-mkrfox1200.upload.use_1200bps_touch=true
-mkrfox1200.upload.wait_for_upload_port=true
-mkrfox1200.upload.native_usb=true
-mkrfox1200.build.mcu=cortex-m0plus
-mkrfox1200.build.f_cpu=48000000L
-mkrfox1200.build.usb_product="Arduino MKR FOX 1200"
-mkrfox1200.build.usb_manufacturer="Arduino LLC"
-mkrfox1200.build.board=SAMD_MKRFox1200
-mkrfox1200.build.core=arduino
-mkrfox1200.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
-mkrfox1200.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
-mkrfox1200.build.openocdscript=openocd_scripts/arduino_zero.cfg
-mkrfox1200.build.variant=mkrfox1200
-mkrfox1200.build.vid=0x2341
-mkrfox1200.build.pid=0x8050
-mkrfox1200.bootloader.tool=openocd
-mkrfox1200.bootloader.file=mkrfox1200/samd21_sam_ba_arduino_mkrfox1200.bin
-
-# Arduino MKR GSM 1400
-# --------------------
-mkrgsm1400.name=Arduino MKR GSM 1400
-mkrgsm1400.vid.0=0x2341
-mkrgsm1400.pid.0=0x8052
-mkrgsm1400.vid.1=0x2341
-mkrgsm1400.pid.1=0x0052
-
-mkrgsm1400.upload.tool=bossac
-mkrgsm1400.upload.protocol=sam-ba
-mkrgsm1400.upload.maximum_size=262144
-mkrgsm1400.upload.use_1200bps_touch=true
-mkrgsm1400.upload.wait_for_upload_port=true
-mkrgsm1400.upload.native_usb=true
-mkrgsm1400.build.mcu=cortex-m0plus
-mkrgsm1400.build.f_cpu=48000000L
-mkrgsm1400.build.usb_product="Arduino MKR GSM 1400"
-mkrgsm1400.build.usb_manufacturer="Arduino LLC"
-mkrgsm1400.build.board=SAMD_MKRGSM1400
-mkrgsm1400.build.core=arduino
-mkrgsm1400.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags} -DUSE_BQ24195L_PMIC
-mkrgsm1400.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
-mkrgsm1400.build.openocdscript=openocd_scripts/arduino_zero.cfg
-mkrgsm1400.build.variant=mkrgsm1400
-mkrgsm1400.build.vid=0x2341
-mkrgsm1400.build.pid=0x8052
-mkrgsm1400.bootloader.tool=openocd
-mkrgsm1400.bootloader.file=mkrgsm1400/samd21_sam_ba_arduino_mkrgsm1400.bin
-
-# Arduino MKR WAN 1300
-# --------------------
-mkrwan1300.name=Arduino MKR WAN 1300
-mkrwan1300.vid.0=0x2341
-mkrwan1300.pid.0=0x8053
-mkrwan1300.vid.1=0x2341
-mkrwan1300.pid.1=0x0053
-
-mkrwan1300.upload.tool=bossac
-mkrwan1300.upload.protocol=sam-ba
-mkrwan1300.upload.maximum_size=262144
-mkrwan1300.upload.use_1200bps_touch=true
-mkrwan1300.upload.wait_for_upload_port=true
-mkrwan1300.upload.native_usb=true
-mkrwan1300.build.mcu=cortex-m0plus
-mkrwan1300.build.f_cpu=48000000L
-mkrwan1300.build.usb_product="Arduino MKR WAN 1300"
-mkrwan1300.build.usb_manufacturer="Arduino LLC"
-mkrwan1300.build.board=SAMD_MKRWAN1300
-mkrwan1300.build.core=arduino
-mkrwan1300.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags}
-mkrwan1300.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
-mkrwan1300.build.openocdscript=openocd_scripts/arduino_zero.cfg
-mkrwan1300.build.variant=mkrwan1300
-mkrwan1300.build.vid=0x2341
-mkrwan1300.build.pid=0x8053
-mkrwan1300.bootloader.tool=openocd
-mkrwan1300.bootloader.file=mkrwan1300/samd21_sam_ba_arduino_mkrwan1300.bin
 
 # Arduino MKR WiFi 1010
 # --------------------
@@ -269,7 +182,7 @@ mkrwifi1010.build.usb_product="Arduino MKR WiFi 1010"
 mkrwifi1010.build.usb_manufacturer="Arduino LLC"
 mkrwifi1010.build.board=SAMD_MKRWIFI1010
 mkrwifi1010.build.core=arduino
-mkrwifi1010.build.extra_flags=-D__SAMD21G18A__ {build.usb_flags} -DUSE_BQ24195L_PMIC
+mkrwifi1010.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags} -DUSE_BQ24195L_PMIC
 mkrwifi1010.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
 mkrwifi1010.build.openocdscript=openocd_scripts/arduino_zero.cfg
 mkrwifi1010.build.variant=mkrwifi1010
@@ -277,6 +190,122 @@ mkrwifi1010.build.vid=0x2341
 mkrwifi1010.build.pid=0x8054
 mkrwifi1010.bootloader.tool=openocd
 mkrwifi1010.bootloader.file=mkrwifi1010/samd21_sam_ba_arduino_mkrwifi1010.bin
+
+# Arduino MKR FOX 1200
+# --------------------
+mkrfox1200.name=Arduino MKR FOX 1200
+mkrfox1200.vid.0=0x2341
+mkrfox1200.pid.0=0x8050
+mkrfox1200.vid.1=0x2341
+mkrfox1200.pid.1=0x0050
+
+mkrfox1200.upload.tool=bossac
+mkrfox1200.upload.protocol=sam-ba
+mkrfox1200.upload.maximum_size=262144
+mkrfox1200.upload.use_1200bps_touch=true
+mkrfox1200.upload.wait_for_upload_port=true
+mkrfox1200.upload.native_usb=true
+mkrfox1200.build.mcu=cortex-m0plus
+mkrfox1200.build.f_cpu=48000000L
+mkrfox1200.build.usb_product="Arduino MKR FOX 1200"
+mkrfox1200.build.usb_manufacturer="Arduino LLC"
+mkrfox1200.build.board=SAMD_MKRFox1200
+mkrfox1200.build.core=arduino
+mkrfox1200.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags}
+mkrfox1200.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkrfox1200.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkrfox1200.build.variant=mkrfox1200
+mkrfox1200.build.vid=0x2341
+mkrfox1200.build.pid=0x8050
+mkrfox1200.bootloader.tool=openocd
+mkrfox1200.bootloader.file=mkrfox1200/samd21_sam_ba_arduino_mkrfox1200.bin
+
+# Arduino MKR WAN 1300
+# --------------------
+mkrwan1300.name=Arduino MKR WAN 1300
+mkrwan1300.vid.0=0x2341
+mkrwan1300.pid.0=0x8053
+mkrwan1300.vid.1=0x2341
+mkrwan1300.pid.1=0x0053
+
+mkrwan1300.upload.tool=bossac
+mkrwan1300.upload.protocol=sam-ba
+mkrwan1300.upload.maximum_size=262144
+mkrwan1300.upload.use_1200bps_touch=true
+mkrwan1300.upload.wait_for_upload_port=true
+mkrwan1300.upload.native_usb=true
+mkrwan1300.build.mcu=cortex-m0plus
+mkrwan1300.build.f_cpu=48000000L
+mkrwan1300.build.usb_product="Arduino MKR WAN 1300"
+mkrwan1300.build.usb_manufacturer="Arduino LLC"
+mkrwan1300.build.board=SAMD_MKRWAN1300
+mkrwan1300.build.core=arduino
+mkrwan1300.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags}
+mkrwan1300.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkrwan1300.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkrwan1300.build.variant=mkrwan1300
+mkrwan1300.build.vid=0x2341
+mkrwan1300.build.pid=0x8053
+mkrwan1300.bootloader.tool=openocd
+mkrwan1300.bootloader.file=mkrwan1300/samd21_sam_ba_arduino_mkrwan1300.bin
+
+# Arduino MKR GSM 1400
+# --------------------
+mkrgsm1400.name=Arduino MKR GSM 1400
+mkrgsm1400.vid.0=0x2341
+mkrgsm1400.pid.0=0x8052
+mkrgsm1400.vid.1=0x2341
+mkrgsm1400.pid.1=0x0052
+
+mkrgsm1400.upload.tool=bossac
+mkrgsm1400.upload.protocol=sam-ba
+mkrgsm1400.upload.maximum_size=262144
+mkrgsm1400.upload.use_1200bps_touch=true
+mkrgsm1400.upload.wait_for_upload_port=true
+mkrgsm1400.upload.native_usb=true
+mkrgsm1400.build.mcu=cortex-m0plus
+mkrgsm1400.build.f_cpu=48000000L
+mkrgsm1400.build.usb_product="Arduino MKR GSM 1400"
+mkrgsm1400.build.usb_manufacturer="Arduino LLC"
+mkrgsm1400.build.board=SAMD_MKRGSM1400
+mkrgsm1400.build.core=arduino
+mkrgsm1400.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags} -DUSE_BQ24195L_PMIC
+mkrgsm1400.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkrgsm1400.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkrgsm1400.build.variant=mkrgsm1400
+mkrgsm1400.build.vid=0x2341
+mkrgsm1400.build.pid=0x8052
+mkrgsm1400.bootloader.tool=openocd
+mkrgsm1400.bootloader.file=mkrgsm1400/samd21_sam_ba_arduino_mkrgsm1400.bin
+
+# Arduino MKR NB 1500
+# --------------------
+mkrnb1500.name=Arduino MKR NB 1500
+mkrnb1500.vid.0=0x2341
+mkrnb1500.pid.0=0x8055
+mkrnb1500.vid.1=0x2341
+mkrnb1500.pid.1=0x0055
+
+mkrnb1500.upload.tool=bossac
+mkrnb1500.upload.protocol=sam-ba
+mkrnb1500.upload.maximum_size=262144
+mkrnb1500.upload.use_1200bps_touch=true
+mkrnb1500.upload.wait_for_upload_port=true
+mkrnb1500.upload.native_usb=true
+mkrnb1500.build.mcu=cortex-m0plus
+mkrnb1500.build.f_cpu=48000000L
+mkrnb1500.build.usb_product="Arduino MKR NB 1500"
+mkrnb1500.build.usb_manufacturer="Arduino LLC"
+mkrnb1500.build.board=SAMD_MKRNB1500
+mkrnb1500.build.core=arduino
+mkrnb1500.build.extra_flags=-DUSE_ARDUINO_MKR_PIN_LAYOUT -D__SAMD21G18A__ {build.usb_flags} -DUSE_BQ24195L_PMIC
+mkrnb1500.build.ldscript=linker_scripts/gcc/flash_with_bootloader.ld
+mkrnb1500.build.openocdscript=openocd_scripts/arduino_zero.cfg
+mkrnb1500.build.variant=mkrnb1500
+mkrnb1500.build.vid=0x2341
+mkrnb1500.build.pid=0x8055
+mkrnb1500.bootloader.tool=openocd
+mkrnb1500.bootloader.file=mkrnb1500/samd21_sam_ba_arduino_mkrnb1500.bin
 
 # Adafruit Circuit Playground M0
 # ------------------------------
@@ -307,8 +336,8 @@ adafruit_circuitplayground_m0.build.pid=0x8018
 adafruit_circuitplayground_m0.bootloader.tool=openocd
 adafruit_circuitplayground_m0.bootloader.file=circuitplay/circuitplay_m0_samd21g18_sam_ba.bin
 
-######################################################
-#ARDUINO M0 PRO (WITH) BOOTLOADER - PROGRAMMING PORT
+# Arduino M0 PRO (with) bootloader - Programming port
+# ---------------------------------------------------
 mzero_pro_bl_dbg.name=Arduino M0 Pro (Programming Port)
 mzero_pro_bl_dbg.vid.0=0x03eb
 mzero_pro_bl_dbg.pid.0=0x2111
@@ -339,8 +368,8 @@ mzero_pro_bl_dbg.bootloader.cmd_protect=at91samd bootloader 16384
 mzero_pro_bl_dbg.bootloader.cmd_protect_verify=at91samd bootloader
 mzero_pro_bl_dbg.bootloader.file=mzero/Bootloader_D21_M0_Pro_150427.hex
 
-######################################################
-#ARDUINO M0 PRO (WITH) BOOTLOADER - NATIVE PORT
+# Arduino M0 PRO (with) bootloader - Native port
+# ----------------------------------------------
 mzero_pro_bl.name=Arduino M0 Pro (Native USB Port)
 mzero_pro_bl.vid.0=0x2a03
 mzero_pro_bl.pid.0=0x004d
@@ -376,8 +405,8 @@ mzero_pro_bl.bootloader.tool=openocd-withbootsize
 mzero_pro_bl.bootloader.file=mzero/Bootloader_D21_M0_Pro_150427.hex
 mzero_pro_bl.bootloader.low_fuses=0xff
 
-######################################################
-#ARDUINO M0 (WITH) BOOTLOADER
+# Arduino M0 (with) Bootloader
+# ----------------------------
 mzero_bl.name=Arduino M0
 mzero_bl.vid.0=0x2a03
 mzero_bl.pid.0=0x004d
@@ -413,9 +442,8 @@ mzero_bl.bootloader.tool=openocd-withbootsize
 mzero_bl.bootloader.low_fuses=0xff
 mzero_bl.bootloader.file=mzero/Bootloader_D21_M0_150515.hex
 
-######################################################
-#ARDUINO TIAN (WITH) BOOTLOADER
-
+# Arduino Tian (with) Bootloader
+# ------------------------------
 tian.name=Arduino Tian
 tian.upload.via_ssh=true
 tian.vid.0=0x10C4
@@ -450,9 +478,8 @@ tian.bootloader.low_fuses=0xff
 tian.bootloader.file=sofia/Sofia_Tian_151118.hex
 tian.drivers=SiliconLabs-CP2105/Silicon Labs VCP Driver.pkg
 
-######################################################
-#ARDUINO TIAN CONSOLE PORT (NOT FOR UPLOAD)
-
+# Arduino Tian Console port (not for upload)
+# ------------------------------------------
 tian_cons.name=Arduino Tian (MIPS Console port)
 tian_cons.vid.0=0x10C4
 tian_cons.pid.0=0xEA70
