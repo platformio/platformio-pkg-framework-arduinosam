@@ -30,9 +30,9 @@
 #define VARIANT_MAINOSC		(32768ul)
 
 /** Master clock frequency */
-#define VARIANT_MCK			  (120000000ul)
+#define VARIANT_MCK        (F_CPU)
 
-#define VARIANT_GCLK0_FREQ (120000000UL)
+#define VARIANT_GCLK0_FREQ (F_CPU)
 #define VARIANT_GCLK1_FREQ (48000000UL)
 #define VARIANT_GCLK2_FREQ (100000000UL)
 
@@ -175,10 +175,11 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define I2S_DEVICE          0
 #define I2S_CLOCK_GENERATOR 3
 
-#define PIN_I2S_SDO          (5u)
-#define PIN_I2S_SDI          PIN_SPI_MOSI
-#define PIN_I2S_SCK          PIN_A2
-#define PIN_I2S_FS           PIN_SPI_MISO
+#define PIN_I2S_SDO          (11u)
+#define PIN_I2S_SDI          (12u)
+#define PIN_I2S_SCK          PIN_SERIAL1_TX
+#define PIN_I2S_FS           (10u)
+#define PIN_I2S_MCK          PIN_SERIAL1_RX
 
 //QSPI Pins
 #define PIN_QSPI_SCK    (34u)
@@ -188,8 +189,10 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define PIN_QSPI_IO2    (38u)
 #define PIN_QSPI_IO3    (39u)
 
-//TODO: meaningful value for this
-#define VARIANT_QSPI_BAUD_DEFAULT 5000000
+#if !defined(VARIANT_QSPI_BAUD_DEFAULT)
+  // TODO: meaningful value for this
+  #define VARIANT_QSPI_BAUD_DEFAULT 5000000
+#endif
 
 #ifdef __cplusplus
 }

@@ -37,9 +37,9 @@ volatile bool toneIsActive = false;
 volatile bool firstTimeRunning = false;
 
 #if defined(__SAMD51__)
-#define TONE_TC         TC2
-#define TONE_TC_IRQn    TC2_IRQn
-#define TONE_TC_GCLK_ID	TC2_GCLK_ID
+#define TONE_TC         TC3
+#define TONE_TC_IRQn    TC3_IRQn
+#define TONE_TC_GCLK_ID	TC3_GCLK_ID
 #else
 #define TONE_TC         TC5
 #define TONE_TC_IRQn    TC5_IRQn
@@ -136,7 +136,7 @@ void tone (uint32_t outputPin, uint32_t frequency, uint32_t duration)
     default: break;
   }
 
-  toggleCount = (duration > 0 ? frequency * duration * 2 / 1000UL : -1);
+  toggleCount = (duration > 0 ? frequency * duration * 2 / 1000UL : -1LL);
 
   resetTC(TONE_TC);
 
