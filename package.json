@@ -2,5 +2,5 @@
     "name": "framework-arduinosam",
     "description": "Arduino Wiring-based Framework (SAM & SAMD Cores)",
     "url": "https://github.com/platformio/platformio-pkg-framework-arduinosam",
-    "version": "4.1.190506"
+    "version": "4.2.190624"
 }
