@@ -57,9 +57,6 @@
 
 #define TU_BIT(n)             (1U << (n))
 
-// for declaration of reserved field, make use of _TU_COUNTER_
-#define TU_RESERVED           XSTRING_CONCAT_(reserved, _TU_COUNTER_)
-
 //--------------------------------------------------------------------+
 // INCLUDES
 //--------------------------------------------------------------------+
@@ -149,9 +146,10 @@ static inline bool     tu_bit_test (uint32_t value, uint8_t n) { return (value &
  * Nth position is the same as the number of arguments
  * - ##__VA_ARGS__ is used to deal with 0 paramerter (swallows comma)
  *------------------------------------------------------------------*/
-#ifndef VA_ARGS_NUM_
+#ifndef TU_ARGS_NUM
 
-#define VA_ARGS_NUM_(...) 	 NARG_(_0, ##__VA_ARGS__,_RSEQ_N())
+#define TU_ARGS_NUM(...) 	 NARG_(_0, ##__VA_ARGS__,_RSEQ_N())
+
 #define NARG_(...)        _GET_NTH_ARG(__VA_ARGS__)
 #define _GET_NTH_ARG( \
           _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \

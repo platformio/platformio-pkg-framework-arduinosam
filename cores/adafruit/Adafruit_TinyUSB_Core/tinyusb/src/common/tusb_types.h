@@ -68,46 +68,57 @@ typedef enum
   TUSB_DIR_IN_MASK = 0x80
 }tusb_dir_t;
 
-
-/// USB Descriptor Types (section 9.4 table 9-5)
+/// USB Descriptor Types
 typedef enum
 {
-  TUSB_DESC_DEVICE                = 0x01 ,
-  TUSB_DESC_CONFIGURATION         = 0x02 ,
-  TUSB_DESC_STRING                = 0x03 ,
-  TUSB_DESC_INTERFACE             = 0x04 ,
-  TUSB_DESC_ENDPOINT              = 0x05 ,
-  TUSB_DESC_DEVICE_QUALIFIER      = 0x06 ,
-  TUSB_DESC_OTHER_SPEED_CONFIG    = 0x07 ,
-  TUSB_DESC_INTERFACE_POWER       = 0x08 ,
-  TUSB_DESC_OTG                   = 0x09 ,
-  TUSB_DESC_DEBUG                 = 0x0A ,
-  TUSB_DESC_INTERFACE_ASSOCIATION = 0x0B ,
-  TUSB_DESC_CLASS_SPECIFIC        = 0x24
+  TUSB_DESC_DEVICE                = 0x01,
+  TUSB_DESC_CONFIGURATION         = 0x02,
+  TUSB_DESC_STRING                = 0x03,
+  TUSB_DESC_INTERFACE             = 0x04,
+  TUSB_DESC_ENDPOINT              = 0x05,
+  TUSB_DESC_DEVICE_QUALIFIER      = 0x06,
+  TUSB_DESC_OTHER_SPEED_CONFIG    = 0x07,
+  TUSB_DESC_INTERFACE_POWER       = 0x08,
+  TUSB_DESC_OTG                   = 0x09,
+  TUSB_DESC_DEBUG                 = 0x0A,
+  TUSB_DESC_INTERFACE_ASSOCIATION = 0x0B,
+
+  TUSB_DESC_BOS                   = 0x0F,
+  TUSB_DESC_DEVICE_CAPABILITY     = 0x10,
+
+  // Class Specific Descriptor
+  TUSB_DESC_CS_DEVICE             = 0x21,
+  TUSB_DESC_CS_CONFIGURATION      = 0x22,
+  TUSB_DESC_CS_STRING             = 0x23,
+  TUSB_DESC_CS_INTERFACE          = 0x24,
+  TUSB_DESC_CS_ENDPOINT           = 0x25,
+
+  TUSB_DESC_SUPERSPEED_ENDPOINT_COMPANION     = 0x30,
+  TUSB_DESC_SUPERSPEED_ISO_ENDPOINT_COMPANION = 0x31
 }tusb_desc_type_t;
 
 typedef enum
 {
-  TUSB_REQ_GET_STATUS =0     , ///< 0
-  TUSB_REQ_CLEAR_FEATURE     , ///< 1
-  TUSB_REQ_RESERVED          , ///< 2
-  TUSB_REQ_SET_FEATURE       , ///< 3
-  TUSB_REQ_RESERVED2         , ///< 4
-  TUSB_REQ_SET_ADDRESS       , ///< 5
-  TUSB_REQ_GET_DESCRIPTOR    , ///< 6
-  TUSB_REQ_SET_DESCRIPTOR    , ///< 7
-  TUSB_REQ_GET_CONFIGURATION , ///< 8
-  TUSB_REQ_SET_CONFIGURATION , ///< 9
-  TUSB_REQ_GET_INTERFACE     , ///< 10
-  TUSB_REQ_SET_INTERFACE     , ///< 11
-  TUSB_REQ_SYNCH_FRAME         ///< 12
+  TUSB_REQ_GET_STATUS        = 0  ,
+  TUSB_REQ_CLEAR_FEATURE     = 1  ,
+  TUSB_REQ_RESERVED          = 2  ,
+  TUSB_REQ_SET_FEATURE       = 3  ,
+  TUSB_REQ_RESERVED2         = 4  ,
+  TUSB_REQ_SET_ADDRESS       = 5  ,
+  TUSB_REQ_GET_DESCRIPTOR    = 6  ,
+  TUSB_REQ_SET_DESCRIPTOR    = 7  ,
+  TUSB_REQ_GET_CONFIGURATION = 8  ,
+  TUSB_REQ_SET_CONFIGURATION = 9  ,
+  TUSB_REQ_GET_INTERFACE     = 10 ,
+  TUSB_REQ_SET_INTERFACE     = 11 ,
+  TUSB_REQ_SYNCH_FRAME       = 12
 }tusb_request_code_t;
 
 typedef enum
 {
-  TUSB_REQ_FEATURE_EDPT_HALT = 0,
+  TUSB_REQ_FEATURE_EDPT_HALT     = 0,
   TUSB_REQ_FEATURE_REMOTE_WAKEUP = 1,
-  TUSB_REQ_FEATURE_TEST_MODE = 2
+  TUSB_REQ_FEATURE_TEST_MODE     = 2
 }tusb_request_feature_selector_t;
 
 typedef enum
@@ -162,6 +173,26 @@ typedef enum
   MISC_PROTOCOL_IAD = 1
 }misc_protocol_type_t;
 
+typedef enum
+{
+  DEVICE_CAPABILITY_WIRELESS_USB               = 0x01,
+  DEVICE_CAPABILITY_USB20_EXTENSION            = 0x02,
+  DEVICE_CAPABILITY_SUPERSPEED_USB             = 0x03,
+  DEVICE_CAPABILITY_CONTAINER_id               = 0x04,
+  DEVICE_CAPABILITY_PLATFORM                   = 0x05,
+  DEVICE_CAPABILITY_POWER_DELIVERY             = 0x06,
+  DEVICE_CAPABILITY_BATTERY_INFO               = 0x07,
+  DEVICE_CAPABILITY_PD_CONSUMER_PORT           = 0x08,
+  DEVICE_CAPABILITY_PD_PROVIDER_PORT           = 0x09,
+  DEVICE_CAPABILITY_SUPERSPEED_PLUS            = 0x0A,
+  DEVICE_CAPABILITY_PRECESION_TIME_MEASUREMENT = 0x0B,
+  DEVICE_CAPABILITY_WIRELESS_USB_EXT           = 0x0C,
+  DEVICE_CAPABILITY_BILLBOARD                  = 0x0D,
+  DEVICE_CAPABILITY_AUTHENTICATION             = 0x0E,
+  DEVICE_CAPABILITY_BILLBOARD_EX               = 0x0F,
+  DEVICE_CAPABILITY_CONFIGURATION_SUMMARY      = 0x10
+}device_capability_type_t;
+
 enum {
   TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP = TU_BIT(5),
   TUSB_DESC_CONFIG_ATT_SELF_POWERED  = TU_BIT(6),
@@ -195,12 +226,26 @@ enum
   INTERFACE_INVALID_NUMBER = 0xff
 };
 
+
+typedef enum
+{
+  MS_OS_20_SET_HEADER_DESCRIPTOR       = 0x00,
+  MS_OS_20_SUBSET_HEADER_CONFIGURATION = 0x01,
+  MS_OS_20_SUBSET_HEADER_FUNCTION      = 0x02,
+  MS_OS_20_FEATURE_COMPATBLE_ID        = 0x03,
+  MS_OS_20_FEATURE_REG_PROPERTY        = 0x04,
+  MS_OS_20_FEATURE_MIN_RESUME_TIME     = 0x05,
+  MS_OS_20_FEATURE_MODEL_ID            = 0x06,
+  MS_OS_20_FEATURE_CCGP_DEVICE         = 0x07,
+  MS_OS_20_FEATURE_VENDOR_REVISION     = 0x08
+} microsoft_os_20_type_t;
+
 //--------------------------------------------------------------------+
-// STANDARD DESCRIPTORS
+// USB Descriptors
 //--------------------------------------------------------------------+
 
-/// USB Standard Device Descriptor (section 9.6.1, table 9-8)
-typedef struct ATTR_PACKED
+/// USB Device Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength            ; ///< Size of this descriptor in bytes.
   uint8_t  bDescriptorType    ; ///< DEVICE Descriptor Type.
@@ -221,8 +266,17 @@ typedef struct ATTR_PACKED
   uint8_t  bNumConfigurations ; ///< Number of possible configurations.
 } tusb_desc_device_t;
 
-/// USB Standard Configuration Descriptor (section 9.6.1 table 9-10) */
-typedef struct ATTR_PACKED
+// USB Binary Device Object Store (BOS) Descriptor
+typedef struct TU_ATTR_PACKED
+{
+  uint8_t  bLength         ; ///< Size of this descriptor in bytes
+  uint8_t  bDescriptorType ; ///< CONFIGURATION Descriptor Type
+  uint16_t wTotalLength    ; ///< Total length of data returned for this descriptor
+  uint8_t  bNumDeviceCaps  ; ///< Number of device capability descriptors in the BOS
+} tusb_desc_bos_t;
+
+/// USB Configuration Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength             ; ///< Size of this descriptor in bytes
   uint8_t  bDescriptorType     ; ///< CONFIGURATION Descriptor Type
@@ -235,8 +289,8 @@ typedef struct ATTR_PACKED
   uint8_t  bMaxPower           ; ///< Maximum power consumption of the USB device from the bus in this specific configuration when the device is fully operational. Expressed in 2 mA units (i.e., 50 = 100 mA).
 } tusb_desc_configuration_t;
 
-/// USB Standard Interface Descriptor (section 9.6.1 table 9-12)
-typedef struct ATTR_PACKED
+/// USB Interface Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength            ; ///< Size of this descriptor in bytes
   uint8_t  bDescriptorType    ; ///< INTERFACE Descriptor Type
@@ -250,22 +304,22 @@ typedef struct ATTR_PACKED
   uint8_t  iInterface         ; ///< Index of string descriptor describing this interface
 } tusb_desc_interface_t;
 
-/// USB Standard Endpoint Descriptor (section 9.6.1 table 9-13)
-typedef struct ATTR_PACKED
+/// USB Endpoint Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength          ; ///< Size of this descriptor in bytes
   uint8_t  bDescriptorType  ; ///< ENDPOINT Descriptor Type
 
   uint8_t  bEndpointAddress ; ///< The address of the endpoint on the USB device described by this descriptor. The address is encoded as follows: \n Bit 3...0: The endpoint number \n Bit 6...4: Reserved, reset to zero \n Bit 7: Direction, ignored for control endpoints 0 = OUT endpoint 1 = IN endpoint.
 
-  struct ATTR_PACKED {
+  struct TU_ATTR_PACKED {
     uint8_t xfer  : 2;
     uint8_t sync  : 2;
     uint8_t usage : 2;
     uint8_t       : 2;
   } bmAttributes     ; ///< This field describes the endpoint's attributes when it is configured using the bConfigurationValue. \n Bits 1..0: Transfer Type \n- 00 = Control \n- 01 = Isochronous \n- 10 = Bulk \n- 11 = Interrupt \n If not an isochronous endpoint, bits 5..2 are reserved and must be set to zero. If isochronous, they are defined as follows: \n Bits 3..2: Synchronization Type \n- 00 = No Synchronization \n- 01 = Asynchronous \n- 10 = Adaptive \n- 11 = Synchronous \n Bits 5..4: Usage Type \n- 00 = Data endpoint \n- 01 = Feedback endpoint \n- 10 = Implicit feedback Data endpoint \n- 11 = Reserved \n Refer to Chapter 5 of USB 2.0 specification for more information. \n All other bits are reserved and must be reset to zero. Reserved bits must be ignored by the host.
 
-  struct ATTR_PACKED {
+  struct TU_ATTR_PACKED {
     uint16_t size           : 11; ///< Maximum packet size this endpoint is capable of sending or receiving when this configuration is selected. \n For isochronous endpoints, this value is used to reserve the bus time in the schedule, required for the per-(micro)frame data payloads. The pipe may, on an ongoing basis, actually use less bandwidth than that reserved. The device reports, if necessary, the actual bandwidth used via its normal, non-USB defined mechanisms. \n For all endpoints, bits 10..0 specify the maximum packet size (in bytes). \n For high-speed isochronous and interrupt endpoints: \n Bits 12..11 specify the number of additional transaction opportunities per microframe: \n- 00 = None (1 transaction per microframe) \n- 01 = 1 additional (2 per microframe) \n- 10 = 2 additional (3 per microframe) \n- 11 = Reserved \n Bits 15..13 are reserved and must be set to zero.
     uint16_t hs_period_mult : 2;
     uint16_t : 0;
@@ -274,8 +328,8 @@ typedef struct ATTR_PACKED
   uint8_t  bInterval        ; ///< Interval for polling endpoint for data transfers. Expressed in frames or microframes depending on the device operating speed (i.e., either 1 millisecond or 125 us units). \n- For full-/high-speed isochronous endpoints, this value must be in the range from 1 to 16. The bInterval value is used as the exponent for a \f$ 2^(bInterval-1) \f$ value; e.g., a bInterval of 4 means a period of 8 (\f$ 2^(4-1) \f$). \n- For full-/low-speed interrupt endpoints, the value of this field may be from 1 to 255. \n- For high-speed interrupt endpoints, the bInterval value is used as the exponent for a \f$ 2^(bInterval-1) \f$ value; e.g., a bInterval of 4 means a period of 8 (\f$ 2^(4-1) \f$) . This value must be from 1 to 16. \n- For high-speed bulk/control OUT endpoints, the bInterval must specify the maximum NAK rate of the endpoint. A value of 0 indicates the endpoint never NAKs. Other values indicate at most 1 NAK each bInterval number of microframes. This value must be in the range from 0 to 255. \n Refer to Chapter 5 of USB 2.0 specification for more information.
 } tusb_desc_endpoint_t;
 
-/// USB Other Speed Configuration Descriptor (section 9.6.1 table 9-11)
-typedef struct ATTR_PACKED
+/// USB Other Speed Configuration Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength             ; ///< Size of descriptor
   uint8_t  bDescriptorType     ; ///< Other_speed_Configuration Type
@@ -288,8 +342,8 @@ typedef struct ATTR_PACKED
   uint8_t  bMaxPower           ; ///< Same as Configuration descriptor
 } tusb_desc_other_speed_t;
 
-/// USB Device Qualifier Descriptor (section 9.6.1 table 9-9)
-typedef struct ATTR_PACKED
+/// USB Device Qualifier Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength            ; ///< Size of descriptor
   uint8_t  bDescriptorType    ; ///< Device Qualifier Type
@@ -304,7 +358,7 @@ typedef struct ATTR_PACKED
 } tusb_desc_device_qualifier_t;
 
 /// USB Interface Association Descriptor (IAD ECN)
-typedef struct ATTR_PACKED
+typedef struct TU_ATTR_PACKED
 {
   uint8_t bLength           ; ///< Size of descriptor
   uint8_t bDescriptorType   ; ///< Other_speed_Configuration Type
@@ -319,27 +373,40 @@ typedef struct ATTR_PACKED
   uint8_t iFunction         ; ///< Index of the string descriptor describing the interface association.
 } tusb_desc_interface_assoc_t;
 
-/// USB Header Descriptor
-typedef struct ATTR_PACKED
-{
-  uint8_t  bLength         ; ///< Size of this descriptor in bytes
-  uint8_t  bDescriptorType ; ///< Descriptor Type
-} tusb_desc_header_t;
-
-typedef struct ATTR_PACKED
+// USB String Descriptor
+typedef struct TU_ATTR_PACKED
 {
   uint8_t  bLength         ; ///< Size of this descriptor in bytes
   uint8_t  bDescriptorType ; ///< Descriptor Type
   uint16_t unicode_string[];
 } tusb_desc_string_t;
 
+// USB Binary Device Object Store (BOS)
+typedef struct TU_ATTR_PACKED
+{
+  uint8_t bLength;
+  uint8_t bDescriptorType ;
+  uint8_t bDevCapabilityType;
+  uint8_t bReserved;
+  uint8_t PlatformCapabilityUUID[16];
+  uint8_t CapabilityData[];
+} tusb_desc_bos_platform_t;
+
+// USB WebuSB URL Descriptor
+typedef struct TU_ATTR_PACKED
+{
+  uint8_t bLength;
+  uint8_t bDescriptorType;
+  uint8_t bScheme;
+  char    url[];
+} tusb_desc_webusb_url_t;
 
 /*------------------------------------------------------------------*/
 /* Types
  *------------------------------------------------------------------*/
-typedef struct ATTR_PACKED{
+typedef struct TU_ATTR_PACKED{
   union {
-    struct ATTR_PACKED {
+    struct TU_ATTR_PACKED {
       uint8_t recipient :  5; ///< Recipient type tusb_request_recipient_t.
       uint8_t type      :  2; ///< Request type tusb_request_type_t.
       uint8_t direction :  1; ///< Direction type. tusb_dir_t
@@ -401,15 +468,6 @@ static inline uint8_t tu_desc_len(void const* desc)
 {
   return ((uint8_t const*) desc)[DESC_OFFSET_LEN];
 }
-
-// Length of the string descriptors in bytes with slen characters
-#define TUD_DESC_STRLEN(_chr_count)      (2*(_chr_count) + 2)
-
-// Header of string descriptors with len + string type
-#define TUD_DESC_STR_HEADER(_chr_count)  ( (uint16_t) ( (TUSB_DESC_STRING << 8 ) | TUD_DESC_STRLEN(_chr_count)) )
-
-// Convert comma-separated string to descriptor unicode format
-#define TUD_DESC_STRCONV( ... )     (const uint16_t[]) { TUD_DESC_STR_HEADER(VA_ARGS_NUM_(__VA_ARGS__)), __VA_ARGS__ }
 
 #ifdef __cplusplus
  }

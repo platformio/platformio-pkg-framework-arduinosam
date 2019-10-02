@@ -111,7 +111,7 @@ bool tud_msc_set_sense(uint8_t lun, uint8_t sense_key, uint8_t add_sense_code, u
 }
 
 //--------------------------------------------------------------------+
-// USBD-CLASS API
+// USBD Driver API
 //--------------------------------------------------------------------+
 void mscd_init(void)
 {
@@ -139,7 +139,7 @@ bool mscd_open(uint8_t rhport, tusb_desc_interface_t const * itf_desc, uint16_t 
   (*p_len) = sizeof(tusb_desc_interface_t) + 2*sizeof(tusb_desc_endpoint_t);
 
   // Prepare for Command Block Wrapper
-  TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_out, (uint8_t*) &p_msc->cbw, sizeof(msc_cbw_t)) );
+  TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_out, (uint8_t*) &p_msc->cbw, sizeof(msc_cbw_t)) );
 
   return true;
 }
@@ -154,7 +154,7 @@ bool mscd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
   {
     case MSC_REQ_RESET:
       // TODO: Actually reset interface.
-      usbd_control_status(rhport, p_request);
+      tud_control_status(rhport, p_request);
     break;
 
     case MSC_REQ_GET_MAX_LUN:
@@ -166,7 +166,7 @@ bool mscd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
       // MAX LUN is minus 1 by specs
       maxlun--;
 
-      usbd_control_xfer(rhport, p_request, &maxlun, 1);
+      tud_control_xfer(rhport, p_request, &maxlun, 1);
     }
     break;
 
@@ -178,10 +178,10 @@ bool mscd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
 
 // Invoked when class request DATA stage is finished.
 // return false to stall control endpoint (e.g Host send non-sense DATA)
-bool mscd_control_request_complete(uint8_t rhport, tusb_control_request_t const * p_request)
+bool mscd_control_complete(uint8_t rhport, tusb_control_request_t const * request)
 {
   (void) rhport;
-  (void) p_request;
+  (void) request;
 
   // nothing to do
   return true;
@@ -200,7 +200,7 @@ int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_t* buff
       resplen = 0;
       if ( !tud_msc_test_unit_ready_cb(lun) )
       {
-        // not ready response with Failed status and sense key = not ready
+        // Failed status response
         resplen = - 1;
 
         // If sense key is not set by callback, default to Logical Unit Not Ready, Cause Not Reportable
@@ -214,7 +214,14 @@ int32_t proc_builtin_scsi(uint8_t lun, uint8_t const scsi_cmd[16], uint8_t* buff
       if (tud_msc_start_stop_cb)
       {
         scsi_start_stop_unit_t const * start_stop = (scsi_start_stop_unit_t const *) scsi_cmd;
-        tud_msc_start_stop_cb(lun, start_stop->power_condition, start_stop->start, start_stop->load_eject);
+        if ( !tud_msc_start_stop_cb(lun, start_stop->power_condition, start_stop->start, start_stop->load_eject) )
+        {
+          // Failed status response
+          resplen = - 1;
+
+          // If sense key is not set by callback, default to Logical Unit Not Ready, Cause Not Reportable
+          if ( _mscd_itf.sense_key == 0 ) tud_msc_set_sense(lun, SCSI_SENSE_NOT_READY, 0x04, 0x00);
+        }
       }
     break;
 
@@ -394,7 +401,7 @@ bool mscd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t
         if ( (p_cbw->total_bytes > 0 ) && !tu_bit_test(p_cbw->dir, 7) )
         {
           // queue transfer
-          TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_out, _mscd_buf, p_msc->total_len) );
+          TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_out, _mscd_buf, p_msc->total_len) );
         }else
         {
           int32_t resplen;
@@ -417,7 +424,7 @@ bool mscd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t
             // failed but senskey is not set: default to Illegal Request
             if ( p_msc->sense_key == 0 ) tud_msc_set_sense(p_cbw->lun, SCSI_SENSE_ILLEGAL_REQUEST, 0x20, 0x00);
 
-            /// Stall bulk In if needed
+            // Stall bulk In if needed
             if (p_cbw->total_bytes) usbd_edpt_stall(rhport, p_msc->ep_in);
           }
           else
@@ -428,7 +435,7 @@ bool mscd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t
             if (p_msc->total_len)
             {
               TU_ASSERT( p_cbw->total_bytes >= p_msc->total_len ); // cannot return more than host expect
-              TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_in, _mscd_buf, p_msc->total_len) );
+              TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_in, _mscd_buf, p_msc->total_len) );
             }else
             {
               p_msc->stage = MSC_STAGE_STATUS;
@@ -543,7 +550,7 @@ bool mscd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t
       p_msc->stage = MSC_STAGE_CMD;
 
       // Send SCSI Status
-      TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_in , (uint8_t*) &p_msc->csw, sizeof(msc_csw_t)) );
+      TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_in , (uint8_t*) &p_msc->csw, sizeof(msc_csw_t)) );
 
       // Invoke complete callback if defined
       if ( SCSI_CMD_READ_10 == p_cbw->command[0])
@@ -560,7 +567,7 @@ bool mscd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t event, uint32_t
       }
 
       // Queue for the next CBW
-      TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_out, (uint8_t*) &p_msc->cbw, sizeof(msc_cbw_t)) );
+      TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_out, (uint8_t*) &p_msc->cbw, sizeof(msc_cbw_t)) );
     }
   }
 
@@ -602,7 +609,7 @@ static void proc_read10_cmd(uint8_t rhport, mscd_interface_t* p_msc)
   }
   else
   {
-    TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_in, _mscd_buf, nbytes), );
+    TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_in, _mscd_buf, nbytes), );
   }
 }
 
@@ -627,7 +634,7 @@ static void proc_write10_cmd(uint8_t rhport, mscd_interface_t* p_msc)
   int32_t nbytes = (int32_t) tu_min32(sizeof(_mscd_buf), p_cbw->total_bytes-p_msc->xferred_len);
 
   // Write10 callback will be called later when usb transfer complete
-  TU_ASSERT( dcd_edpt_xfer(rhport, p_msc->ep_out, _mscd_buf, nbytes), );
+  TU_ASSERT( usbd_edpt_xfer(rhport, p_msc->ep_out, _mscd_buf, nbytes), );
 }
 
 #endif

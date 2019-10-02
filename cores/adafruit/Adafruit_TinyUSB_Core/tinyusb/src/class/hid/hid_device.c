@@ -73,28 +73,31 @@ bool tud_hid_ready(void)
 {
   uint8_t itf = 0;
   uint8_t const ep_in = _hidd_itf[itf].ep_in;
-  return tud_ready() && (ep_in != 0) && !dcd_edpt_busy(TUD_OPT_RHPORT, ep_in);
+  return tud_ready() && (ep_in != 0) && !usbd_edpt_busy(TUD_OPT_RHPORT, ep_in);
 }
 
 bool tud_hid_report(uint8_t report_id, void const* report, uint8_t len)
 {
-  TU_VERIFY( tud_hid_ready() && (len <= CFG_TUD_HID_BUFSIZE) );
+  TU_VERIFY( tud_hid_ready() );
 
   uint8_t itf = 0;
   hidd_interface_t * p_hid = &_hidd_itf[itf];
 
-  // If report id = 0, skip ID field
   if (report_id)
   {
+    len = tu_min8(len, CFG_TUD_HID_BUFSIZE-1);
+
     p_hid->epin_buf[0] = report_id;
     memcpy(p_hid->epin_buf+1, report, len);
     len++;
   }else
   {
+    // If report id = 0, skip ID field
+    len = tu_min8(len, CFG_TUD_HID_BUFSIZE);
     memcpy(p_hid->epin_buf, report, len);
   }
 
-  return dcd_edpt_xfer(TUD_OPT_RHPORT, p_hid->ep_in, p_hid->epin_buf, len);
+  return usbd_edpt_xfer(TUD_OPT_RHPORT, p_hid->ep_in, p_hid->epin_buf, len);
 }
 
 bool tud_hid_boot_mode(void)
@@ -180,7 +183,7 @@ bool hidd_open(uint8_t rhport, tusb_desc_interface_t const * desc_itf, uint16_t 
   *p_len = sizeof(tusb_desc_interface_t) + sizeof(tusb_hid_descriptor_hid_t) + desc_itf->bNumEndpoints*sizeof(tusb_desc_endpoint_t);
 
   // Prepare for output endpoint
-  if (p_hid->ep_out) TU_ASSERT(dcd_edpt_xfer(rhport, p_hid->ep_out, p_hid->epout_buf, sizeof(p_hid->epout_buf)));
+  if (p_hid->ep_out) TU_ASSERT(usbd_edpt_xfer(rhport, p_hid->ep_out, p_hid->epout_buf, sizeof(p_hid->epout_buf)));
 
   return true;
 }
@@ -202,7 +205,7 @@ bool hidd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
     if (p_request->bRequest == TUSB_REQ_GET_DESCRIPTOR && desc_type == HID_DESC_TYPE_REPORT)
     {
       uint8_t const * desc_report = tud_hid_descriptor_report_cb();
-      usbd_control_xfer(rhport, p_request, (void*) desc_report, p_hid->reprot_desc_len);
+      tud_control_xfer(rhport, p_request, (void*) desc_report, p_hid->reprot_desc_len);
     }else
     {
       return false; // stall unsupported request
@@ -222,12 +225,12 @@ bool hidd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
         uint16_t xferlen  = tud_hid_get_report_cb(report_id, (hid_report_type_t) report_type, p_hid->epin_buf, p_request->wLength);
         TU_ASSERT( xferlen > 0 );
 
-        usbd_control_xfer(rhport, p_request, p_hid->epin_buf, xferlen);
+        tud_control_xfer(rhport, p_request, p_hid->epin_buf, xferlen);
       }
       break;
 
       case  HID_REQ_CONTROL_SET_REPORT:
-        usbd_control_xfer(rhport, p_request, p_hid->epout_buf, p_request->wLength);
+        tud_control_xfer(rhport, p_request, p_hid->epout_buf, p_request->wLength);
       break;
 
       case HID_REQ_CONTROL_SET_IDLE:
@@ -238,18 +241,18 @@ bool hidd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
           if ( !tud_hid_set_idle_cb(p_hid->idle_rate) ) return false;
         }
 
-        usbd_control_status(rhport, p_request);
+        tud_control_status(rhport, p_request);
       break;
 
       case HID_REQ_CONTROL_GET_IDLE:
         // TODO idle rate of report
-        usbd_control_xfer(rhport, p_request, &p_hid->idle_rate, 1);
+        tud_control_xfer(rhport, p_request, &p_hid->idle_rate, 1);
       break;
 
       case HID_REQ_CONTROL_GET_PROTOCOL:
       {
         uint8_t protocol = 1-p_hid->boot_mode;   // 0 is Boot, 1 is Report protocol
-        usbd_control_xfer(rhport, p_request, &protocol, 1);
+        tud_control_xfer(rhport, p_request, &protocol, 1);
       }
       break;
 
@@ -258,7 +261,7 @@ bool hidd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
 
         if (tud_hid_boot_mode_cb) tud_hid_boot_mode_cb(p_hid->boot_mode);
 
-        usbd_control_status(rhport, p_request);
+        tud_control_status(rhport, p_request);
       break;
 
       default: return false; // stall unsupported request
@@ -273,7 +276,7 @@ bool hidd_control_request(uint8_t rhport, tusb_control_request_t const * p_reque
 
 // Invoked when class request DATA stage is finished.
 // return false to stall control endpoint (e.g Host send non-sense DATA)
-bool hidd_control_request_complete(uint8_t rhport, tusb_control_request_t const * p_request)
+bool hidd_control_complete(uint8_t rhport, tusb_control_request_t const * p_request)
 {
   (void) rhport;
   hidd_interface_t* p_hid = get_interface_by_itfnum( (uint8_t) p_request->wIndex );
@@ -303,7 +306,7 @@ bool hidd_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_
   if (ep_addr == p_hid->ep_out)
   {
     tud_hid_set_report_cb(0, HID_REPORT_TYPE_INVALID, p_hid->epout_buf, xferred_bytes);
-    TU_ASSERT(dcd_edpt_xfer(rhport, p_hid->ep_out, p_hid->epout_buf, sizeof(p_hid->epout_buf)));
+    TU_ASSERT(usbd_edpt_xfer(rhport, p_hid->ep_out, p_hid->epout_buf, sizeof(p_hid->epout_buf)));
   }
 
   return true;

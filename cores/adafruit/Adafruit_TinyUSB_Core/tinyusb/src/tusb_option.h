@@ -27,11 +27,10 @@
 #ifndef _TUSB_OPTION_H_
 #define _TUSB_OPTION_H_
 
-#define TUSB_VERSION_YEAR   00
-#define TUSB_VERSION_MONTH  00
-#define TUSB_VERSION_WEEK   0
-#define TUSB_VERSION_NAME   "alpha"
-#define TUSB_VERSION        XSTRING_(TUSB_VERSION_YEAR) "." XSTRING_(TUSB_VERSION_MONTH)
+#define TUSB_VERSION_MAJOR     0
+#define TUSB_VERSION_MINOR     5
+#define TUSB_VERSION_REVISION  0
+#define TUSB_VERSION_STRING    TU_STRING(TUSB_VERSION_MAJOR) "." TU_STRING(TUSB_VERSION_MINOR) "." TU_STRING(TUSB_VERSION_REVISION)
 
 /** \defgroup group_mcu Supported MCU
  * \ref CFG_TUSB_MCU must be defined to one of these
@@ -131,7 +130,7 @@
 #endif
 
 #ifndef CFG_TUSB_MEM_ALIGN
-#define CFG_TUSB_MEM_ALIGN        ATTR_ALIGNED(4)
+#define CFG_TUSB_MEM_ALIGN        TU_ATTR_ALIGNED(4)
 #endif
 
 #ifndef CFG_TUSB_OS
@@ -162,8 +161,8 @@
   #define CFG_TUD_MIDI            0
 #endif
 
-#ifndef CFG_TUD_CUSTOM_CLASS
-  #define CFG_TUD_CUSTOM_CLASS    0
+#ifndef CFG_TUD_VENDOR
+  #define CFG_TUD_VENDOR          0
 #endif
 
 
