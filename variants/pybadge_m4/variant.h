@@ -98,6 +98,7 @@ extern "C"
 #define PIN_A7               (PIN_A0 + 7)
 #define PIN_A8               (PIN_A0 + 8)
 #define PIN_A9               (PIN_A0 + 9)
+#define PIN_BANDGAP_ADC      52
 
 #define PIN_DAC0             PIN_A0
 #define PIN_DAC1             PIN_A1
@@ -135,7 +136,7 @@ static const uint8_t ATN = PIN_ATN;
 /*
  * SPI Interfaces
  */
-#define SPI_INTERFACES_COUNT 2
+#define SPI_INTERFACES_COUNT 3
 
 #define PIN_SPI_MISO         (26u)
 #define PIN_SPI_MOSI         (27u)
@@ -149,7 +150,7 @@ static const uint8_t MOSI = PIN_SPI_MOSI ;
 static const uint8_t MISO = PIN_SPI_MISO ;
 static const uint8_t SCK  = PIN_SPI_SCK ;
 
-  // Internal SPI for TFT
+// Internal SPI for TFT
 #define PIN_SPI1_MOSI         (41u)
 #define PIN_SPI1_SCK          (42u)
 #define PIN_SPI1_MISO         (43u)
@@ -162,6 +163,19 @@ static const uint8_t MOSI1 = PIN_SPI1_MOSI ;
 static const uint8_t MISO1 = PIN_SPI1_MISO ;
 static const uint8_t SCK1 = PIN_SPI1_SCK ;
 
+// SPI for PDM mic
+#define PIN_SPI2_MOSI         (9u)
+#define PIN_SPI2_SCK          (5u)
+#define PIN_SPI2_MISO         (6u)
+#define PERIPH_SPI2           sercom3
+#define PAD_SPI2_TX           SPI_PAD_3_SCK_1
+#define PAD_SPI2_RX           SERCOM_RX_PAD_2
+
+static const uint8_t SS2	  = 10 ;
+static const uint8_t MOSI2 = PIN_SPI2_MOSI ;
+static const uint8_t MISO2 = PIN_SPI2_MISO ;
+static const uint8_t SCK2 = PIN_SPI2_SCK ;
+
 /*
  * Wire Interfaces
  */
@@ -171,6 +185,10 @@ static const uint8_t SCK1 = PIN_SPI1_SCK ;
 #define PIN_WIRE_SCL         (25u)
 #define PERIPH_WIRE          sercom2
 #define WIRE_IT_HANDLER      SERCOM2_Handler
+#define WIRE_IT_HANDLER_0    SERCOM2_0_Handler
+#define WIRE_IT_HANDLER_1    SERCOM2_1_Handler
+#define WIRE_IT_HANDLER_2    SERCOM2_2_Handler
+#define WIRE_IT_HANDLER_3    SERCOM2_3_Handler
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
@@ -187,6 +205,9 @@ static const uint8_t SCL = PIN_WIRE_SCL;
  */
 #define I2S_INTERFACES_COUNT 0
 
+// On-board QSPI Flash
+#define EXTERNAL_FLASH_DEVICES   GD25Q16C
+#define EXTERNAL_FLASH_USE_QSPI
 
 //QSPI Pins
 #define PIN_QSPI_SCK    (35u)
@@ -247,5 +268,5 @@ extern Uart Serial1;
 #define SERIAL_PORT_HARDWARE        Serial1
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 
-#endif /* _VARIANT_FEATHER_M4_ */
+#endif /* _VARIANT_PYBADGE_M4_ */
 

@@ -16,8 +16,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_METRO_M4_
-#define _VARIANT_METRO_M4_
+#ifndef _VARIANT_PYPORTAL_M4_
+#define _VARIANT_PYPORTAL_M4_
 
 // The definitions here needs a SAMD core >=1.6.10
 #define ARDUINO_SAMD_VARIANT_COMPLIANCE 10610
@@ -175,6 +175,11 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 #define PIN_WIRE_SCL         (28u)
 #define PERIPH_WIRE          sercom5
 #define WIRE_IT_HANDLER      SERCOM5_Handler
+#define WIRE_IT_HANDLER_0    SERCOM5_0_Handler
+#define WIRE_IT_HANDLER_1    SERCOM5_1_Handler
+#define WIRE_IT_HANDLER_2    SERCOM5_2_Handler
+#define WIRE_IT_HANDLER_3    SERCOM5_3_Handler
+
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
@@ -185,6 +190,10 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define PIN_USB_HOST_ENABLE (29ul) // ???
 #define PIN_USB_DM          (48ul)
 #define PIN_USB_DP          (49ul)
+
+// On-board QSPI Flash
+#define EXTERNAL_FLASH_DEVICES   GD25Q64C
+#define EXTERNAL_FLASH_USE_QSPI
 
 //QSPI Pins
 #define PIN_QSPI_SCK	(42u)
@@ -245,5 +254,5 @@ extern Uart Serial1;
 #define SERIAL_PORT_HARDWARE        Serial1
 #define SERIAL_PORT_HARDWARE_OPEN   Serial1
 
-#endif /* _VARIANT_METRO_M4_ */
+#endif /* _VARIANT_PYPORTAL_M4_ */
 

@@ -157,6 +157,10 @@ static const uint8_t SCK  = PIN_SPI_SCK ;
 #define PIN_WIRE_SCL         (22u)
 #define PERIPH_WIRE          sercom2
 #define WIRE_IT_HANDLER      SERCOM2_Handler
+#define WIRE_IT_HANDLER_0    SERCOM2_0_Handler
+#define WIRE_IT_HANDLER_1    SERCOM2_1_Handler
+#define WIRE_IT_HANDLER_2    SERCOM2_2_Handler
+#define WIRE_IT_HANDLER_3    SERCOM2_3_Handler
 
 static const uint8_t SDA = PIN_WIRE_SDA;
 static const uint8_t SCL = PIN_WIRE_SCL;
@@ -181,6 +185,10 @@ static const uint8_t SCL = PIN_WIRE_SCL;
 #define PIN_I2S_SCK          PIN_SERIAL1_TX
 #define PIN_I2S_FS           (10u)
 #define PIN_I2S_MCK          PIN_SERIAL1_RX
+
+// On-board QSPI Flash
+#define EXTERNAL_FLASH_DEVICES   GD25Q16C
+#define EXTERNAL_FLASH_USE_QSPI
 
 //QSPI Pins
 #define PIN_QSPI_SCK    (34u)

@@ -29,9 +29,9 @@ const PinDescription g_APinDescription[]=
 {
   // 0..13 - Digital pins
   // ----------------------
-  // 0/1 - PDM Mic (but could also be used for UART or serial
-  { PORTA,  17, PIO_SERCOM, PIN_ATTR_PWM_F, No_ADC_Channel, TCC1_CH1, TC2_CH1, EXTERNAL_INT_1 }, // Uart on PDM pins (sercom 1)
-  { PORTA,  16, PIO_SERCOM, PIN_ATTR_PWM_F, No_ADC_Channel, TCC1_CH0, TC2_CH0, EXTERNAL_INT_0 }, // Uart on PDM pins (sercom 1)
+  // 0/1 - PDM Mic (but could also be used for UART or serial)
+  { PORTA,  16, PIO_SERCOM_ALT, PIN_ATTR_PWM_F, No_ADC_Channel, TCC1_CH0, TC2_CH0, EXTERNAL_INT_0 }, // Uart RX on PDM pins (sercom 3.1/1.0)
+  { PORTA,  17, PIO_SERCOM_ALT, PIN_ATTR_PWM_F, No_ADC_Channel, TCC1_CH1, TC2_CH1, EXTERNAL_INT_1 }, // Uart TX on PDM pins (sercom 3.0/1.1)
 
   // 2..12
   // Digital Low
@@ -87,6 +87,12 @@ const PinDescription g_APinDescription[]=
   { PORTA, 9, PIO_COM, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_9 },
   { PORTA, 10, PIO_COM, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_10 },
   { PORTA, 11, PIO_COM, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_11 },
+
+  // 35 - SWD Clock
+  { PORTA, 30, PIO_DIGITAL, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_14 },
+  // 36- SWD Data
+  { PORTA, 31, PIO_DIGITAL, PIN_ATTR_NONE, No_ADC_Channel, NOT_ON_PWM, NOT_ON_TIMER, EXTERNAL_INT_15 },
+
 } ;
 
 const void* g_apTCInstances[TCC_INST_NUM+TC_INST_NUM]={ TCC0, TCC1, TCC2, TC0, TC1, TC2, TC3 } ;
@@ -99,22 +105,3 @@ SERCOM sercom2( SERCOM2 ) ;
 SERCOM sercom3( SERCOM3 ) ;
 SERCOM sercom4( SERCOM4 ) ;
 SERCOM sercom5( SERCOM5 ) ;
-
-Uart Serial1( &sercom1, PIN_SERIAL1_RX, PIN_SERIAL1_TX, PAD_SERIAL1_RX, PAD_SERIAL1_TX ) ;
-
-void SERCOM1_0_Handler()
-{
-  Serial1.IrqHandler();
-}
-void SERCOM1_1_Handler()
-{
-  Serial1.IrqHandler();
-}
-void SERCOM1_2_Handler()
-{
-  Serial1.IrqHandler();
-}
-void SERCOM1_3_Handler()
-{
-  Serial1.IrqHandler();
-}
